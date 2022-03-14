@@ -26,7 +26,7 @@ benchmark_parameters(
 
 \item{Y}{Vector of outcomes}
 
-\item{Z}{Vector of treatment assignment}
+\item{Z}{Vector of treatment assignment (Only necessary if \code{estimand = "PATE"} in order to estimate covariances)}
 
 \item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
 
@@ -35,7 +35,7 @@ benchmark_parameters(
 \item{estimate}{Weighted estimate}
 }
 \value{
-Data frame containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder.
+\code{data.frame} containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder.
 }
 \description{
 Returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)

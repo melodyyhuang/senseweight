@@ -9,7 +9,9 @@
 #' @export
 robustness_value<-function(q=1, estimate, sigma2, weights){
     a = q^2*estimate^2/(sigma2*var(weights))
-    return((sqrt(a^2 + 4*a) - a)/2)
+    RV_est = (sqrt(a^2 + 4*a) - a)/2
+    names(RV_est) = NULL
+    return(RV_est)
 }
 
 
@@ -22,10 +24,10 @@ robustness_value<-function(q=1, estimate, sigma2, weights){
 #' @param k_sigma Relative ability of omitted confounder to explain variation in the true weights. If \code{k_sigma > 1}, then we expect the omitted confounder to explain more variation in the true weights than the benchmarked covariate(s). If \code{k_sigma < 1}, then we expect the omitted confounder to explain less of the variation in the true weights than the benchmarked covariate(s). Default is set to 1.
 #' @param k_rho Relative correlation of omitted confounder with the outcome. If \code{k_rho > 1}, then we expect the omitted confounder to be more correlated with the outcome than the benchmarked covariate(s). If \code{k_rho < 1}, then we expect the omitted confounder to be less correlated with the outcome than the benchmarked covariate(s). Default is set to 1.
 #' @param Y Vector of outcomes 
-#' @param Z Vector of treatment assignment 
+#' @param Z Vector of treatment assignment (Only necessary if \code{estimand = "PATE"} in order to estimate covariances)
 #' @param sigma2 Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)
 #' @param estimand String specifying the estimand of interest. Valid inputs are "PATE", "Augmented", "ATT", or "Survey". 
-#' @return Data frame containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder. 
+#' @return \code{data.frame} containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder. 
 #' @export
 benchmark_parameters<-function(weights, weights_benchmark, k_sigma = 1, k_rho = 1, 
                                Y, Z, sigma2, estimand="ATT"){
