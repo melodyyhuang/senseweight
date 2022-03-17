@@ -92,10 +92,10 @@ contour_plot<-function(varW, sigma2, killer_confounder, df_benchmark, benchmark=
     p1 = df_plot %>%
         ggplot(aes(x = R2, y = rho, z = bias)) +
         geom_contour(col="black") + ggtitle("")+xlab(expression(R[epsilon]^2))+
-        ylab(expression(rho[epsilon*","*tau]))+geom_text_contour(aes(z = bias), stroke=0.2)
+        ylab(expression(rho[epsilon*","*tau]))+metR::geom_text_contour(aes(z = bias), stroke=0.2)
 
     if(!is.na(killer_confounder)){
-        p1 = p1 + geom_contour_fill(breaks = c(killer_confounder, 1000*killer_confounder), fill='blue', alpha=0.25)+
+        p1 = p1 + metR::geom_contour_fill(breaks = c(killer_confounder, 1000*killer_confounder), fill='blue', alpha=0.25)+
         geom_contour(breaks=c(killer_confounder), col='blue', size=1)
     }
 
@@ -103,12 +103,12 @@ contour_plot<-function(varW, sigma2, killer_confounder, df_benchmark, benchmark=
         if(shade==TRUE){
             p1 = p1+geom_point(data = df_benchmark, aes(x = R2_benchmark, y = rho_benchmark,
                 color=(variable %in% shade_var))) +
-                geom_label_repel(data = df_benchmark, aes(x=R2_benchmark, y = rho_benchmark, label = variable,
+                ggrepel::geom_label_repel(data = df_benchmark, aes(x=R2_benchmark, y = rho_benchmark, label = variable,
                 color=(variable %in% shade_var)), nudge_y = 0.05, fill='white')+
                 scale_colour_manual(values=c("slategray", "black"))+theme(legend.position='none')
         }else{
             p1 = p1+geom_point(data = df_benchmark, aes(x = R2_benchmark, y = rho_benchmark)) +
-                    geom_label_repel(data = df_benchmark, aes(x=R2_benchmark, y = rho_benchmark, label = variable),
+                ggrepel::geom_label_repel(data = df_benchmark, aes(x=R2_benchmark, y = rho_benchmark, label = variable),
                         nudge_y = 0.05)
         }
     }

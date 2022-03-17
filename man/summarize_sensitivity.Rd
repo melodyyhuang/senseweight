@@ -12,7 +12,8 @@ summarize_sensitivity(
   estimate = NULL,
   unweighted = NULL,
   sigma2 = NULL,
-  estimand = "ATT"
+  estimand = "ATT",
+  pretty = FALSE
 )
 }
 \arguments{
@@ -31,10 +32,12 @@ summarize_sensitivity(
 \item{sigma2}{(Optional) Variance of outcomes or individual-level treatment effect in PATE case. In the case of a PATE estimator, if not specified, function will automatically estimate an upper bound for the variance of the individual-level treatment effect.}
 
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
+
+\item{pretty}{If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.}
 }
 \value{
 Sensitivity summary
 }
 \description{
-Returns a Kable table with summary measures of sensitivity
+Returns a data.frame or Kable table with summary measures of sensitivity
 }

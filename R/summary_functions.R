@@ -5,7 +5,7 @@
 #' @param weights Vector of estimated weights
 #' @param data data.frame containing outcomes and covariate infromation 
 #' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
-#' @weight_max Maximum weight to trim at. Default set to \code{Inf}
+#' @param weight_max Maximum weight to trim at. Default set to \code{Inf}
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' @return Robustness value for a specified proportion change
 #' @export
@@ -80,12 +80,14 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
   df_benchmark$MRCS = estimate/df_benchmark$bias
   df_benchmark$k_sigma_min = RV/df_benchmark$R2_benchmark
   df_benchmark$k_rho_min = sqrt(RV)/df_benchmark$rho_benchmark
+  df_benchmark = df_benchmark %>% 
+    dplyr::mutate_if(is.numeric, round, 2)
   return(df_benchmark)
 }
 
 #' Sensitivity Summary 
 #'
-#' Returns a Kable table with summary measures of sensitivity 
+#' Returns a data.frame or Kable table with summary measures of sensitivity 
 #' @param weights Vector of estimated weights
 #' @param Y Outcome of interest 
 #' @param Z Treatment assignment 
@@ -94,12 +96,13 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
 #' @param unweighted (Optional) Unweighted point estimate.
 #' @param sigma2 (Optional) Variance of outcomes or individual-level treatment effect in PATE case. In the case of a PATE estimator, if not specified, function will automatically estimate an upper bound for the variance of the individual-level treatment effect.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
+#' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
 #' @return Sensitivity summary
 #' @export
 summarize_sensitivity<-function(weights, Y, Z, q = 1, 
                                 estimate = NULL, unweighted=NULL, 
                                 sigma2=NULL, 
-                                estimand="ATT"){
+                                estimand="ATT", pretty=FALSE){
   if(is.null(unweighted)){
     model_DiM = estimatr::lm_robust(Y~Z)
     DiM = coef(model_DiM)[2]    
@@ -128,21 +131,31 @@ summarize_sensitivity<-function(weights, Y, Z, q = 1,
     cor_w = cor(weights[Z==0], Y[Z==0])
   }
   #Calculate Robustness Value: 
-  RV = robustness_value(q=q, estimate, sigma2, weights)
-  df_summary = data.frame(Unweighted = round(DiM, 2), Estimate = round(estimate,2), RV = round(RV,2))
+  RV = robustness_value(q=q, estimate, sigma2, weights[Z==0])
+  df_summary = data.frame(Unweighted = round(DiM, 2), Estimate = round(estimate,2), SE = round(model_ipw$std.error[2],2), 
+                          RV = round(RV,2))
   
   if(estimand=="PATE"){
-    output = paste("$\\\\widehat \\\\sigma_{\\\\tau, max}=$", round(sqrt(vartau), 2), 
+    output = paste("$\\\\widehat \\\\sigma_{\\\\tau, max}=$", round(sqrt(sigma2), 2), 
                    "$\\\\widehat{cor}(w, \\\\tau) =$", round(cor_w,2), sep=", ")  
   }else{
-    output = paste("$\\\\widehat \\\\sigma_{Y}=$", round(sqrt(vartau), 2), 
+    output = paste("$\\\\widehat \\\\sigma_{Y}=$", round(sqrt(sigma2), 2), 
                    "$\\\\widehat{cor}(w, Y) =$", round(cor_w,2), sep=", ")
   }
-  return(
-    kbl(df_summary, align='c') %>% 
-      kable_styling(full_width=F) %>% 
-      add_footnote(label=output, escape=FALSE)
-  )
+  if(pretty==TRUE){
+    return(
+      kbl(df_summary, align='c') %>% 
+        kable_styling(full_width=F) %>% 
+        kableExtra::add_footnote(label=output, escape=FALSE)
+    )    
+  }else{
+    if(estimand=="PATE"){
+      return(data.frame(df_summary, sigma_tau_bound = round(sqrt(sigma2), 2), cor_w = round(cor_w,2)))
+    }else{
+      return(data.frame(df_summary, sigma_Y = round(sqrt(sigma2), 2), cor_w = round(cor_w,2)))  
+    }
+    
+  }
   
 }
 
