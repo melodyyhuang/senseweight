@@ -46,6 +46,7 @@ benchmark<-function(omit, weights, data, sigma2,
 #' @param sigma2 If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' @return data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder for the set of pre-specified covariates.
+#' @export 
 run_benchmarking<-function(weighting_vars, benchmark_vars = 'all', 
                            data, treatment = Z, outcome = Y, selection = S,
                            weighting_method='ebal', weight_max = Inf,
@@ -84,7 +85,7 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
 
 #' Sensitivity Summary 
 #'
-#' Returns a Kale table with summary measures of sensitivity 
+#' Returns a Kable table with summary measures of sensitivity 
 #' @param weights Vector of estimated weights
 #' @param Y Outcome of interest 
 #' @param Z Treatment assignment 

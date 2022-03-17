@@ -36,5 +36,5 @@ summarize_sensitivity(
 Sensitivity summary
 }
 \description{
-Returns a Kale table with summary measures of sensitivity
+Returns a Kable table with summary measures of sensitivity
 }
