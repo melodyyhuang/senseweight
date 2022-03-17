@@ -23,6 +23,8 @@ benchmark(
 
 \item{weighting_method}{Weighting method. Supports weighting methods from the package \code{WeightIt}.}
 
+\item{weight_max}{Maximum weight to trim at. Default set to \code{Inf}}
+
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
 }
 \value{

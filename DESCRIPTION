@@ -11,7 +11,10 @@ Imports:
     knitr,
     metR,
     survey,
-    tidyr
+    tidyr,
+    WeightIt
 Depends: 
     R (>= 2.10)
 LazyData: true
+Suggests: 
+    estimatr

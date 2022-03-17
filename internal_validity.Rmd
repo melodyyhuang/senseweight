@@ -1,0 +1,78 @@
+---
+title: "Introduction to Sensitivity Analysis for Weighted Estimators"
+author: "Melody Huang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to Sensitivity Analysis for Weighted Estimators}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction 
+... 
+
+In the following vignette, we illustrate how to conduct sensitivity analysis for weighted estimators in chte context of observational studies. We will look at the Lalonde dataset. 
+
+``` r
+# install.packages("devtools")
+devtools::install_github("melodyyhuang/senseweight")
+```
+
+## Loading the data: 
+
+```{r}
+library(senseweight)
+library(tidyverse)
+df<-lalonde::nsw_dw %>% select(-data_id)
+#Outcome of interest is re78: 
+df$re78 = df$re78
+df$re74 = df$re74
+df$re75 = df$re75
+head(df)
+
+#Estimate the treatment effect (ATT): 
+model_ps = WeightIt::weightit(treat~.-re78, data = df, method='ps', estimand="ATT")
+weights = model_ps$weights
+model_dim = estimatr::lm_robust(re78~treat, data = df)
+dim = coef(model_dim)[2]
+model_ipw = estimatr::lm_robust(re78~treat, weights=weights, data = df)
+ipw = coef(model_ipw)[2]
+```
+
+```{r} 
+summarize_sensitivity(weights=weights, 
+                      Y=df$re78, 
+                      Z=df$treat)
+```
+
+
+```{r}
+weighting_vars = names(df)[which(!names(df) %in% c("treat", "re78"))]
+RV = robustness_value(q=1, ipw, 
+                      var(df$re78[df$treat==0]), 
+                      weights=weights[df$treat==0])
+
+df_benchmark = run_benchmarking(weighting_vars, data = df, 
+                 treatment="treat", outcome = "re78", 
+                 estimate=ipw, 
+                 RV = RV)
+
+print(df_benchmark)
+```
+
+
+
+```{r}
+contour_plot(var(weights[df$treat==0]), var(df$re78[df$treat==0]), ipw, df_benchmark, benchmark=TRUE, shade=FALSE)+
+    geom_point(aes(x = RV, y=sqrt(RV))) +
+    annotate("text", x = RV-0.01, y = sqrt(RV)+0.02, 
+        label=expression(RV[1]*"= 0.63"), hjust=0, vjust=0, size=3)
+```
