@@ -2,6 +2,7 @@
 
 export(benchmark)
 export(benchmark_parameters)
+export(benchmark_survey)
 export(calculate_extreme_scenario)
 export(contour_plot)
 export(estimate_bias)

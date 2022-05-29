@@ -9,7 +9,9 @@ summarize_sensitivity(
   Y,
   Z,
   q = 1,
+  b_star = 0,
   estimate = NULL,
+  SE = NULL,
   unweighted = NULL,
   sigma2 = NULL,
   estimand = "ATT",
@@ -26,6 +28,8 @@ summarize_sensitivity(
 \item{q}{Proportion to evaluate roustness value at. Default at \code{q=1}}
 
 \item{estimate}{(Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}}
+
+\item{SE}{(Optional) Standard error associated with the weighted point estimate}
 
 \item{unweighted}{(Optional) Unweighted point estimate.}
 

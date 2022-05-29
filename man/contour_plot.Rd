@@ -12,7 +12,8 @@ contour_plot(
   benchmark = TRUE,
   shade = FALSE,
   shade_var = NULL,
-  print = FALSE
+  print = FALSE,
+  binwidth = NULL
 )
 }
 \arguments{

@@ -93,16 +93,31 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
 #' @param Z Treatment assignment 
 #' @param q Proportion to evaluate roustness value at. Default at \code{q=1} 
 #' @param estimate (Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}
+#' @param SE (Optional) Standard error associated with the weighted point estimate
 #' @param unweighted (Optional) Unweighted point estimate.
 #' @param sigma2 (Optional) Variance of outcomes or individual-level treatment effect in PATE case. In the case of a PATE estimator, if not specified, function will automatically estimate an upper bound for the variance of the individual-level treatment effect.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
 #' @return Sensitivity summary
 #' @export
-summarize_sensitivity<-function(weights, Y, Z, q = 1, 
-                                estimate = NULL, unweighted=NULL, 
-                                sigma2=NULL, 
-                                estimand="ATT", pretty=FALSE){
+summarize_sensitivity<-function(weights, Y, Z, q = 1, b_star = 0,
+                                estimate = NULL, SE = NULL, unweighted=NULL, 
+                                sigma2=NULL, estimand="ATT", pretty=FALSE,
+                                dependent_var = NULL, model =  NULL, outcome_function = NULL, 
+                                sy_srs = NULL){
+  if(estimand == "Survey"){
+    if(!is.null(model)){
+      return(summarize_sensitivity_survey(dependent_var, model, outcome_function, svy_srs, Y, b_star))
+    }else{
+      sigma2 = var(Y)
+      RV = robustness_value(q=1, estimate-b_star, sigma2, weights)
+      df_summary = data.frame(Unweighted = round(unweighted, 2), 
+                              Estimate = round(estimate,2), 
+                              SE = round(SE,2), 
+                              RV = round(RV,2))
+      return(data.frame(df_summary, sigma_Y = sigma2, cor_w = round(cor(weights, Y))))
+    }
+  }
   if(is.null(unweighted)){
     model_DiM = estimatr::lm_robust(Y~Z)
     DiM = coef(model_DiM)[2]    

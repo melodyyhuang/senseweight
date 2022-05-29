@@ -1,0 +1,167 @@
+---
+title: "Introduction to Sensitivity Analysis for Survey Weighting"
+author: "Melody Huang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to Sensitivity Analysis for Survey Weighting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction 
+
+In the following vignette, we illustrate how to conduct sensitivity analysis for survey weighting. 
+
+``` r
+# install.packages("devtools")
+devtools::install_github("melodyyhuang/senseweight")
+```
+
+# Setting up the data
+
+```{r, message=FALSE, warnings=FALSE}
+library(senseweight)
+library(tidyverse)
+library(survey)
+```
+
+```{r, echo=FALSE}
+load('~/Desktop/senseweight/election_2016.Rdata')
+cces = cces %>% select(recode_vote_2016, recode_age_bucket, recode_female, 
+                       recode_race, recode_region, recode_educ_3way, 
+                       recode_pid_3way, recode_born) %>% 
+        rename(recode_vote_2016 = vote,
+               recode_age_bucket = age_bucket, 
+               recode_female = female, 
+               recode_race = race, 
+               recode_region = region, 
+               recode_educ_3way = educ, 
+               recode_pid_3way = pid, 
+               recode_born = born_again)
+cbs = cbs %>% select(recode_vote_2016, recode_age_bucket, recode_female, 
+                       recode_race, recode_region, recode_educ_3way, 
+                       recode_pid_3way, recode_born) %>% 
+        rename(recode_vote_2016 = vote,
+               recode_age_bucket = age_bucket, 
+               recode_female = female, 
+               recode_race = race, 
+               recode_region = region, 
+               recode_educ_3way = educ, 
+               recode_pid_3way = pid, 
+               recode_born = born_again)
+library(ggplot2)
+library(tidyverse)
+#library(ggrepel)
+#library(metR)
+ggMelody<-theme_minimal() + theme(plot.title = element_text(hjust = 0.5, size = 17, face = "bold"),
+                             axis.text=element_text(size=9), #size = 12
+                             #legend.text=element_text(size=7),
+                             legend.position='bottom', axis.title = element_text(size = 12),
+                             strip.text.x = element_text(size = 12, face='bold'),
+                             strip.text.y = element_text(size = 12, face='bold'),
+                             plot.subtitle=element_text(size = 14, hjust=0.5))
+theme_set(ggMelody)
+```
+
+We begin by loading in the data.
+```
+load('election_2016')
+```
+
+This loads in two objects: `cces` and `cbs`, which contains the data from the CCES 2016 survey, and the CBS polls. We will begin by setting up our survey design objects. 
+```{r}
+cbs_srs <- svydesign(ids = ~1, data = cbs)
+cces_awt <- svydesign(ids = ~1, weights = ~commonweight_vv_post, data = cces)
+```
+
+To perform raking: 
+```{r}
+#Computes the vote contrast: 
+vote_contrast <- quote((recode_vote_2016Democrat - recode_vote_2016Republican) /
+                       (recode_vote_2016Democrat + recode_vote_2016Republican))
+
+#Function for creating targets from auxiliary information and formula
+create_targets <- function (target_design, target_formula) {
+    target_mf <- model.frame(target_formula, model.frame(target_design))
+    target_mm <- model.matrix(target_formula, target_mf)
+    wts <- weights(target_design)
+    colSums(target_mm * wts) / sum(wts)
+}
+#Set up raking formula: 
+formula_rake <- ~recode_age_bucket + recode_female +
+  recode_race + recode_region + recode_educ_3way + recode_pid_3way +
+  recode_born
+#Generate targets: 
+targets_rake <- create_targets(cces_awt, formula_rake)
+
+#PERFORM RAKING: 
+model_rake <- calibrate(design = cbs_srs,
+                              formula = formula_rake,
+                              population = targets_rake,
+                              calfun = "raking")
+```
+
+```{r}
+#Raw Outcome: 
+y = cbs$recode_vote_2016 == "Democrat"
+sd_y = sd(cbs$recode_vote_2016 == "Democrat")
+
+#Estimate from raking results: 
+weights = weights(model_rake)*nrow(model_rake)
+
+#Generate estimate: 
+svycontrast(svymean(~recode_vote_2016, model_rake, na.rm = TRUE), vote_contrast)
+```
+
+# Conducting Sensitivity Analysis 
+
+We can output the sensitivity summary statistics using `summarize_sensitivity` function. If you are using the `survey` package, you can simply input the model you use to estimate the weights (i.e., `model_rake`), the function for estimating the quantity of interest (i.e., `vote_contrast`), and the survey design object (i.e., `cbs_srs`). 
+
+```{r} 
+summarize_sensitivity("recode_vote_2016", model_rake, vote_contrast, 
+                      cbs_srs, Y=y, estimand="Survey")
+```
+
+
+Alternatively, if you are not using the `survey` package to estimate the weights, you can load in the quantites/estimates individually.
+
+```{r}
+unweighted = svycontrast(svymean(~recode_vote_2016, cbs_srs, na.rm = TRUE), vote_contrast)[1] %>% as.numeric()
+estimate = svycontrast(svymean(~recode_vote_2016, model_rake, na.rm = TRUE), vote_contrast)[1] %>% as.numeric()
+estimate_se = svycontrast(svymean(~recode_vote_2016, model_rake, na.rm = TRUE), vote_contrast)[2] %>% as.numeric()
+cces_est = svycontrast(svymean(~recode_vote_2016, cces_awt, na.rm = TRUE), vote_contrast)[1] %>% as.numeric()
+
+summarize_sensitivity(weights=weights, Y=y, estimate = estimate, SE = estimate_se,
+                      unweighted=unweighted, estimand="Survey")
+```
+
+To perform benchmarking: 
+
+```{r}
+benchmark_results = lapply(all.vars(formula_rake), benchmark_survey,
+    formula=formula_rake,
+    y=y, design=cbs_srs, target = cces_awt, weights_orig = weights) %>% bind_rows()
+var_names = c("Age", "Gender", "Race", "Region", "Educ.", "Party", "Born Again")
+benchmark_results$variable = var_names
+
+benchmark_results$biasx100 = benchmark_results$bias*100
+benchmark_results$mrcs = estimate/benchmark_results$bias
+benchmark_results$adj_margin = (estimate - benchmark_results$bias)*100
+
+print(benchmark_results[,-4])
+```
+
+The bias contour plot can be generated using `contour_plot`: 
+
+```{r}
+contour_plot(var(weights), var(y), estimate, benchmark_results, benchmark=TRUE, shade=FALSE)+
+  coord_flip() + ylab(expression(rho[epsilon*","*Y]))
+```

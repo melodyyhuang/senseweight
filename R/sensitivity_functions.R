@@ -76,7 +76,7 @@ benchmark_parameters<-function(weights, weights_benchmark, k_sigma = 1, k_rho = 
 #' @return A ggplot2 object, containing the bias contour plot
 #' @export
 contour_plot<-function(varW, sigma2, killer_confounder, df_benchmark, benchmark=TRUE,
-                       shade=FALSE, shade_var = NULL, print=FALSE){
+                       shade=FALSE, shade_var = NULL, print=FALSE, binwidth=NULL){
     r2_vals <- seq(0.0, 0.95, by=0.05)
     rho_vals<-seq(-1, 1, by=0.05)
     data.fit <-  expand.grid(rho_vals, r2_vals)
@@ -84,6 +84,7 @@ contour_plot<-function(varW, sigma2, killer_confounder, df_benchmark, benchmark=
     bias = data.fit$rho*sqrt(varW*(data.fit$r2/(1-data.fit$r2)))*sqrt(sigma2)
     df_plot = data.frame(R2=data.fit$r2, rho = data.fit$rho, bias = bias)
 
+    
     if(benchmark==TRUE){
         df_benchmark_plot = df_benchmark
         df_benchmark_plot$rho_benchmark[abs(df_benchmark_plot$rho_benchmark) > 1] = NA
@@ -94,6 +95,12 @@ contour_plot<-function(varW, sigma2, killer_confounder, df_benchmark, benchmark=
         geom_contour(col="black") + ggtitle("")+xlab(expression(R[epsilon]^2))+
         ylab(expression(rho[epsilon*","*tau]))+metR::geom_text_contour(aes(z = bias), stroke=0.2)
 
+      if(!is.null(binwidth)){
+      p1 = df_plot %>%
+        ggplot(aes(x = R2, y = rho, z = bias)) +
+        geom_contour(col="black", binwidth=binwidth) + ggtitle("")+xlab(expression(R[epsilon]^2))+
+        ylab(expression(rho[epsilon*","*tau]))+metR::geom_text_contour(aes(z = bias), stroke=0.2, binwidth=binwidth)
+    }
     if(!is.na(killer_confounder)){
         p1 = p1 + metR::geom_contour_fill(breaks = c(killer_confounder, 1000*killer_confounder), fill='blue', alpha=0.25)+
         geom_contour(breaks=c(killer_confounder), col='blue', size=1)
