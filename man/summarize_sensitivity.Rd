@@ -15,7 +15,11 @@ summarize_sensitivity(
   unweighted = NULL,
   sigma2 = NULL,
   estimand = "ATT",
-  pretty = FALSE
+  pretty = FALSE,
+  dependent_var = NULL,
+  model = NULL,
+  outcome_function = NULL,
+  sy_srs = NULL
 )
 }
 \arguments{
