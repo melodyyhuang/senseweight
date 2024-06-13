@@ -8,7 +8,6 @@ summarize_sensitivity(
   weights,
   Y,
   Z,
-  q = 1,
   b_star = 0,
   estimate = NULL,
   SE = NULL,
@@ -29,8 +28,6 @@ summarize_sensitivity(
 
 \item{Z}{Treatment assignment}
 
-\item{q}{Proportion to evaluate roustness value at. Default at \code{q=1}}
-
 \item{estimate}{(Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}}
 
 \item{SE}{(Optional) Standard error associated with the weighted point estimate}
@@ -42,6 +39,8 @@ summarize_sensitivity(
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
 
 \item{pretty}{If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.}
+
+\item{q}{Proportion to evaluate roustness value at. Default at \code{q=1}}
 }
 \value{
 Sensitivity summary

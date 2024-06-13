@@ -4,12 +4,12 @@
 \alias{robustness_value}
 \title{Robustness Value}
 \usage{
-robustness_value(q = 1, estimate, sigma2, weights)
+robustness_value(estimate, b_star = 0, sigma2, weights)
 }
 \arguments{
-\item{q}{Proportion of the point estimate that the bias is equal to (i.e., at \code{q=1}, the bias will be as large as the point estimate, indiating the bias is large enough to reduce the estimate to zero)}
-
 \item{estimate}{Weighted estimate}
+
+\item{b_star}{Threshold that corresponds to a substantively meaningful change to the research conclusion. For example, a value of 0 denotes that the bias from omitting a variable was sufficiently large to change the estimate to zero.}
 
 \item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
 

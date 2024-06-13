@@ -1,14 +1,14 @@
 #' Robustness Value
 #'
 #' Returns the estimated robustness value, for a specified proportion change
-#' @param q Proportion of the point estimate that the bias is equal to (i.e., at \code{q=1}, the bias will be as large as the point estimate, indiating the bias is large enough to reduce the estimate to zero)
+#' @param b_star Threshold that corresponds to a substantively meaningful change to the research conclusion. For example, a value of 0 denotes that the bias from omitting a variable was sufficiently large to change the estimate to zero. 
 #' @param estimate Weighted estimate
 #' @param sigma2 Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)
 #' @param weights Vector of estimated weights
 #' @return Robustness value for a specified proportion change
 #' @export
-robustness_value<-function(q=1, estimate, sigma2, weights){
-    a = q^2*estimate^2/(sigma2*var(weights))
+robustness_value<-function(estimate, b_star = 0, sigma2, weights){
+    a = (estimate-b_star)^2/(sigma2*var(weights))
     RV_est = (sqrt(a^2 + 4*a) - a)/2
     names(RV_est) = NULL
     return(RV_est)

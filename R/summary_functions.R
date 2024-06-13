@@ -100,7 +100,7 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
 #' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
 #' @return Sensitivity summary
 #' @export
-summarize_sensitivity<-function(weights, Y, Z, q = 1, b_star = 0,
+summarize_sensitivity<-function(weights, Y, Z, b_star = 0,
                                 estimate = NULL, SE = NULL, unweighted=NULL, 
                                 sigma2=NULL, estimand="ATT", pretty=FALSE,
                                 dependent_var = NULL, model =  NULL, outcome_function = NULL, 
@@ -146,7 +146,7 @@ summarize_sensitivity<-function(weights, Y, Z, q = 1, b_star = 0,
     cor_w = cor(weights[Z==0], Y[Z==0])
   }
   #Calculate Robustness Value: 
-  RV = robustness_value(q=q, estimate, sigma2, weights[Z==0])
+  RV = robustness_value(estimate, b_star, sigma2, weights[Z==0])
   df_summary = data.frame(Unweighted = round(DiM, 2), Estimate = round(estimate,2), SE = round(model_ipw$std.error[2],2), 
                           RV = round(RV,2))
   
