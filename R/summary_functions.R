@@ -76,7 +76,7 @@ run_benchmarking<-function(weighting_vars, benchmark_vars = 'all',
   df_benchmark = data.frame(
     lapply(benchmark_vars, benchmark, weights=weights, data=data, sigma2 = sigma2, 
            weighting_method = weighting_method, weight_max = weight_max, estimand=estimand) %>%
-      bind_rows())
+      dplyr::bind_rows())
   df_benchmark$MRCS = estimate/df_benchmark$bias
   df_benchmark$k_sigma_min = RV/df_benchmark$R2_benchmark
   df_benchmark$k_rho_min = sqrt(RV)/df_benchmark$rho_benchmark
