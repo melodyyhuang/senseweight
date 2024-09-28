@@ -104,10 +104,10 @@ summarize_sensitivity<-function(weights, Y, Z, b_star = 0,
                                 estimate = NULL, SE = NULL, unweighted=NULL, 
                                 sigma2=NULL, estimand="ATT", pretty=FALSE,
                                 dependent_var = NULL, model =  NULL, outcome_function = NULL, 
-                                svy_srs = NULL){
+                                svy_srs = NULL, svy_wt = NULL){
   if(estimand == "Survey"){
     if(!is.null(model)){
-      return(summarize_sensitivity_survey(dependent_var, model, outcome_function, svy_srs, Y, b_star))
+      return(summarize_sensitivity_survey(svy_srs, svy_wt, weights, var(Y), b_star))
     }else{
       sigma2 = var(Y)
       RV = robustness_value(estimate = estimate-b_star, sigma2=sigma2, weights = weights)
