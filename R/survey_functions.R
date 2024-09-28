@@ -23,8 +23,8 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
   out <- data.frame(
     Unweighted = estimate_srs,
     Unweighted_SE = estimate_srs_se,
-    Weighted = estimate_wt,
-    Estimate = estimate_wt_se,
+    Estimate = estimate_wt,
+    SE = estimate_wt_se,
     RV = round(RV,2)
   )
   return(out)
