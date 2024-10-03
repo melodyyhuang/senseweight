@@ -168,4 +168,4 @@ The `senseweight` package also includes a Shiny app that allows users to interac
 run_app()
 ```
 
-![shinysenseweight](man/figures/shinysenseweight.png)
+[![](man/figures/shinysenseweight.png)](https://tiffanymtang.shinyapps.io/senseweight/)

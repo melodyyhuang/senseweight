@@ -206,7 +206,4 @@ be run locally by running:
 run_app()
 ```
 
-<figure>
-<img src="man/figures/shinysenseweight.png" alt="shinysenseweight" />
-<figcaption aria-hidden="true">shinysenseweight</figcaption>
-</figure>
+[![](man/figures/shinysenseweight.png)](https://tiffanymtang.shinyapps.io/senseweight/)
