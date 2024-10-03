@@ -23,7 +23,6 @@ estimate_bias <- function(rho, R2, weights, sigma2) {
 #' @param R2 R^2 measure for how much variation in the true weights is explained by the error term, must be bound on the range \code{[0,1)}
 #' @return Correlation between the error and the weights, based on a user-input \code{R2} value and \code{cor(w,Y)}
 #' @export
-
 generate_rho <- function(rho_w, k, R2) {
   if (R2 >= 1 || R2 < 0) {
     return("R2 must be bound on interval [0,1)")
@@ -58,12 +57,12 @@ calculate_extreme_scenario <- function(rho_w, sigma2, correlations = c(0.25, 0.5
         rho = unlist(cor_values[x])
       )
     }
-  ) %>% bind_rows()
+  ) |> bind_rows()
 
   df_plot <- df_plot[which(abs(df_plot$rho) < sqrt(1 - rho_w^2)), ]
 
-  find_max <- df_plot %>%
-    group_by(type) %>%
+  find_max <- df_plot |>
+    group_by(type) |>
     summarize(
       val = max(R2_vals)
     )
@@ -76,9 +75,8 @@ calculate_extreme_scenario <- function(rho_w, sigma2, correlations = c(0.25, 0.5
   df_plot$type_abs <- paste(abs(as.numeric(paste(df_plot$type))))
   df_plot$type_abs <- as.factor(df_plot$type_abs)
   df_plot$type_abs <- fct_rev(df_plot$type_abs)
-  #
+  
   levels(df_plot$type_abs) <- paste(abs(df_plot$type)[order(-abs(df_plot$type))])
-  # c("0.9", "0.5", "0.25")
 
   return(df_plot)
 }

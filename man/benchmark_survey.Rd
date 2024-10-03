@@ -5,29 +5,29 @@
 \title{Benchmark (for survey weights)}
 \usage{
 benchmark_survey(
-  drop_variable,
+  omit,
   formula,
-  y,
-  design,
-  target,
-  weights_orig,
-  calfun_choice = "raking"
+  weights,
+  pop_svy,
+  sample_svy,
+  Y,
+  weighting_method
 )
 }
 \arguments{
-\item{drop_variable}{Variable to benchmark}
+\item{omit}{Variable to benchmark}
 
 \item{formula}{Raking formula}
 
-\item{y}{Response variable}
+\item{weights}{A vector, containing the estimated survey weights}
 
-\item{design}{Survey object, containing the survey sample being re-weighted}
+\item{pop_svy}{Survey object, containing the population the survey sample is being re-weighted to}
 
-\item{target}{Survey object, containing the population the survey sample is being re-weighted to}
+\item{sample_svy}{Survey object, containing the survey sample being re-weighted}
 
-\item{weights_orig}{Weights used for analysis}
+\item{Y}{outcome of interest}
 
-\item{calfun_choice}{Weighting method (default to raking)}
+\item{weighting_method}{Weighting method (default to raking)}
 }
 \value{
 Benchmarking results for a variable (or subset of variables)

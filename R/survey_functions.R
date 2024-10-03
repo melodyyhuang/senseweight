@@ -13,13 +13,12 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
   estimate_wt <- as.data.frame(svy_wt)[, 1]
   estimate_wt_se <- as.data.frame(svy_wt)[, 2]
 
-  RV <- senseweight::robustness_value(
+  RV <- robustness_value(
     estimate = estimate_wt - b_star,
     sigma2 = varY,
     weights = weights
   )
 
-  # May need to find a nicer way to format this
   out <- data.frame(
     Unweighted = estimate_srs,
     Unweighted_SE = estimate_srs_se,
@@ -36,6 +35,7 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #' Returns benchmarking results for survey weighting
 #' @param omit Variable to benchmark
 #' @param formula Raking formula
+#' @param weights A vector, containing the estimated survey weights
 #' @param sample_svy Survey object, containing the survey sample being re-weighted
 #' @param pop_svy Survey object, containing the population the survey sample is being re-weighted to
 #' @param Y outcome of interest
@@ -69,7 +69,7 @@ benchmark_survey <- function(omit, formula, weights, pop_svy,
 
   return(data.frame(
     variable = omit,
-    senseweight::benchmark_parameters(
+    benchmark_parameters(
       weights,
       weights_benchmark,
       Y = Y,

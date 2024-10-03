@@ -31,8 +31,6 @@ benchmark_parameters(
 \item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
 
 \item{estimand}{String specifying the estimand of interest. Valid inputs are "PATE", "Augmented", "ATT", or "Survey".}
-
-\item{estimate}{Weighted estimate}
 }
 \value{
 \code{data.frame} containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder.

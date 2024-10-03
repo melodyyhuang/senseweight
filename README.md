@@ -47,8 +47,8 @@ data(jtpa_women)
 
 ``` r
 #Summarize sites
-jtpa_women %>%
-    group_by(site) %>%
+jtpa_women |>
+    group_by(site) |>
         summarize(
             length(prevearn),
             mean(prevearn),

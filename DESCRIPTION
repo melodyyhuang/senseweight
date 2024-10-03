@@ -2,19 +2,39 @@ Package: senseweight
 Type: Package
 Title: Sensitivity Analysis for Weighted Estimators
 Version: 0.0.1.0
-RoxygenNote: 7.1.1
-Imports: 
-    dplyr,
-    ggplot2,
-    ggrepel,
-    kableExtra,
-    knitr,
-    metR,
-    survey,
-    tidyr,
-    WeightIt
+Authors@R: 
+  c(
+    person("Melody", "Huang", , "melody.huang@yale.edu", role = c("aut", "cre")),
+    person("Tiffany", "Tang", , "ttang4@nd.edu", role = c("aut"))
+  )
+Description: This package provides functions and an interactive Shiny app to conduct rigorous sensitivity analyses for weighted estimators.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 2.10)
 LazyData: true
-Suggests: 
-    estimatr
+Imports: 
+    bslib,
+    dplyr,
+    estimatr,
+    ggplot2,
+    ggrepel,
+    htmltools,
+    kableExtra,
+    lalonde,
+    metR,
+    purrr,
+    shiny,
+    shinydashboard,
+    shinyjs,
+    shinyWidgets,
+    shinyWrappers (>= 0.0.0.9000),
+    survey,
+    tidyselect,
+    vthemes (>= 0.1.0),
+    WeightIt
+Remotes: 
+    tiffanymtang/shinyWrappers,
+    Yu-Group/vthemes

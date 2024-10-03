@@ -12,7 +12,7 @@
 benchmark <- function(omit, weights, data, sigma2,
                       weighting_method = "ebal",
                       weight_max = Inf, estimand = "ATT") {
-  data_benchmark <- data %>% dplyr::select(-omit)
+  data_benchmark <- data |> dplyr::select(-omit)
   model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
     data = data_benchmark,
     method = weighting_method, estimand = "ATT"
@@ -48,8 +48,6 @@ benchmark <- function(omit, weights, data, sigma2,
 #' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
 #' @param weight_max Maximum weight to trim at. Default set to \code{Inf}.
 #' @param estimate Weighted estimate
-#' @param k_sigma Relative ability of omitted confounder to explain variation in the true weights. If \code{k_sigma > 1}, then we expect the omitted confounder to explain more variation in the true weights than the benchmarked covariate(s). If \code{k_sigma < 1}, then we expect the omitted confounder to explain less of the variation in the true weights than the benchmarked covariate(s). Default is set to 1.
-#' @param k_rho Relative correlation of omitted confounder with the outcome. If \code{k_rho > 1}, then we expect the omitted confounder to be more correlated with the outcome than the benchmarked covariate(s). If \code{k_rho < 1}, then we expect the omitted confounder to be less correlated with the outcome than the benchmarked covariate(s). Default is set to 1.
 #' @param RV Robustness Value
 #' @param sigma2 If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
@@ -74,7 +72,7 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
     data$missing <- 1 - data$selection
   }
   keep_covariates <- append(c("outcome", "treatment", "selection", "missing"), weighting_vars)
-  data <- data %>% dplyr::select(keep_covariates)
+  data <- data |> dplyr::select(keep_covariates)
   model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
     data = data,
     method = weighting_method, estimand = "ATT"
@@ -87,13 +85,13 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
     lapply(benchmark_vars, benchmark,
       weights = weights, data = data, sigma2 = sigma2,
       weighting_method = weighting_method, weight_max = weight_max, estimand = estimand
-    ) %>%
+    ) |>
       dplyr::bind_rows()
   )
   df_benchmark$MRCS <- estimate / df_benchmark$bias
   df_benchmark$k_sigma_min <- RV / df_benchmark$R2_benchmark
   df_benchmark$k_rho_min <- sqrt(RV) / df_benchmark$rho_benchmark
-  df_benchmark <- df_benchmark %>%
+  df_benchmark <- df_benchmark |>
     dplyr::mutate_if(is.numeric, round, 2)
   return(df_benchmark)
 }
@@ -104,7 +102,6 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 #' @param weights Vector of estimated weights
 #' @param Y Outcome of interest
 #' @param Z Treatment assignment
-#' @param q Proportion to evaluate roustness value at. Default at \code{q=1}
 #' @param estimate (Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}
 #' @param SE (Optional) Standard error associated with the weighted point estimate
 #' @param unweighted (Optional) Unweighted point estimate.
@@ -181,8 +178,8 @@ summarize_sensitivity <- function(weights, Y, Z, b_star = 0,
   }
   if (pretty == TRUE) {
     return(
-      kbl(df_summary, align = "c") %>%
-        kable_styling(full_width = F) %>%
+      kbl(df_summary, align = "c") |>
+        kable_styling(full_width = F) |>
         kableExtra::add_footnote(label = output, escape = FALSE)
     )
   } else {
