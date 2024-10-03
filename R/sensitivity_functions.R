@@ -192,7 +192,9 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
       axis_title_size = axis_title_size,
       axis_line_width = axis_line_width
     ) +
-    ggplot2::coord_flip()
+    ggplot2::coord_flip() +
+    ggplot2::scale_x_continuous(expand = c(0.01, 0.01)) +
+    ggplot2::scale_y_continuous(expand = c(0.01, 0.01))
   if (print) {
     return(list(plot = plt, data = df_plot))
   } else {
