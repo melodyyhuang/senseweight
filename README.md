@@ -198,9 +198,9 @@ contour_plot(
 ## Shiny senseweight app
 
 The `senseweight` package also includes a Shiny app that allows users to
-interactively conduct sensitivity analyses. The app is available
-[here](https://tiffanymtang.shinyapps.io/senseweight/). The app can also
-be run locally by running:
+interactively conduct sensitivity analyses. The app is available at
+<https://tiffanymtang.shinyapps.io/senseweight/>. The app can also be
+run locally by running:
 
 ``` r
 run_app()

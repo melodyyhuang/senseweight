@@ -66,7 +66,7 @@ run_app <- function(...) {
       title_position = "center",
       title_style = list(
         `font-variant` = "small-caps", `font-size` = "26px",
-        `font-family` = "'Fira Sans', sans-serif"
+        `font-family` = "'Quattrocento Sans'"
       )
     ),
     
@@ -241,7 +241,8 @@ run_app <- function(...) {
       shiny::tags$head(
         shiny::tags$style(
           shiny::HTML(
-            "@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+            "@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Quattrocento:wght@400;700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Quattrocento:wght@400;700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
             @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');"
           )
         )
@@ -249,14 +250,14 @@ run_app <- function(...) {
       shiny::tags$head(
         shiny::tags$style(
           shiny::HTML(
-            "body {font-family: 'Zilla Slab', sans serif; font-size: 16px};"
+            "body {font-family: 'Quattrocento'; font-size: 16px};"
           )
         )
       ),
       shiny::tags$head(
         shiny::tags$style(
           shiny::HTML(
-            "h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {font-family: 'Fira Sans', sans serif;};"
+            "h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {font-family: 'Fira Sans';};"
           )
         )
       ),
@@ -264,6 +265,13 @@ run_app <- function(...) {
         shiny::tags$style(
           shiny::HTML(
             "#analysis_type>.btn-group>.btn-group>.btn {padding: 6px 8px;};"
+          )
+        )
+      ),
+      shiny::tags$head(
+        shiny::tags$style(
+          shiny::HTML(
+            "label.control-label {font-family: 'Quattrocento Sans';};"
           )
         )
       ),
