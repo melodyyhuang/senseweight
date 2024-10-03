@@ -1,8 +1,8 @@
 #' National Jobs Training Partnership Act (JTPA) Experimental Data
 #'
-#' A dataset containing the earnings and other demographic characteristics of 
+#' A dataset containing the earnings and other demographic characteristics of
 #' individuals identified as women from the JTPA experiment, spanning 16 different
-#' experimental sites. 
+#' experimental sites.
 #'
 #' @format A data frame with 6109 total observations, and 11 columns
 #' \describe{
