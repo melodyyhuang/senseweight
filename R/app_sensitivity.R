@@ -10,6 +10,23 @@ sensitivityFun <- function(input, output, session,
   shiny::reactive({
     shiny::req(analysis_type())
     
+    if (analysis_type() == "survey") {
+      shiny::req(
+        mainDataInput(), populationDataInput(), Y(),
+        weightingMethod(), weightingVars()
+      )
+    } else if (analysis_type() == "experiment") {
+      shiny::req(
+        mainDataInput(), populationDataInput(), Y(), treatment(),
+        weightingMethod(), weightingVars()
+      )
+    } else if (analysis_type() == "observational") {
+      shiny::req(
+        mainDataInput(), Y(), treatment(),
+        weightingMethod(), weightingVars()
+      )
+    }
+    
     # initialize variables
     data <- mainDataInput()
     population_data <- populationDataInput()
@@ -23,12 +40,18 @@ sensitivityFun <- function(input, output, session,
     contrast1 <- contrast1()
     contrast2 <- contrast2()
     
+    # # error checking
+    # if (!is.numeric(data[[response_var]])) {
+    #   stop("Response variable must be numeric.")
+    # }
+    # if (!identical(treatment_var, "")) {
+    #   if (!is.numeric(data[[treatment_var]]) | 
+    #       any(!(data[[treatment_var]] %in% c(0, 1)))) {
+    #     stop("Treatment variable must be numeric and binary (0/1).")
+    #   }
+    # }
+    
     if (analysis_type() == "survey") {
-      shiny::req(
-        mainDataInput(), populationDataInput(), Y(),
-        weightingMethod(), weightingVars()
-      )
-      
       #GENERATE SURVEY OBJECTS:
       survey_objs <- generate_survey_objects(
         data, population_data,
@@ -98,11 +121,6 @@ sensitivityFun <- function(input, output, session,
     } else if (analysis_type() %in% c("experiment", "observational")) {
       #SET UP OBJECTS:
       if (analysis_type() == "experiment") {
-        shiny::req(
-          mainDataInput(), populationDataInput(), Y(), treatment(),
-          weightingMethod(), weightingVars()
-        )
-        
         sensitivity_results <- generalize_experiment(
           experiment = data,
           target_pop = population_data,
@@ -113,11 +131,6 @@ sensitivityFun <- function(input, output, session,
           b_star = b_star
         )
       } else if (analysis_type() == "observational") {
-        shiny::req(
-          mainDataInput(), Y(), treatment(),
-          weightingMethod(), weightingVars()
-        )
-        
         sensitivity_results <- run_obs_analysis(
           data = data,
           treatment = treatment_var,

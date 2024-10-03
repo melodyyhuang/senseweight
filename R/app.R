@@ -481,11 +481,18 @@ run_app <- function(...) {
       }
     })
     popWeights <- shiny::reactive({
+      pop_weights <- NULL
       if (input$analysis_type == "survey") {
-        populationDataInput()[[input$pop_weights_survey]]
+        pop_weights <- populationDataInput()[[input$pop_weights_survey]]
       } else if (input$analysis_type == "experiment") {
-        populationDataInput()[[input$pop_weights_experiment]]
+        pop_weights <- populationDataInput()[[input$pop_weights_experiment]]
       }
+      # if (!is.null(pop_weights)) {
+      #   if (!is.numeric(pop_weights)) {
+      #     stop("Population weights variable must be numeric.")
+      #   }
+      # }
+      return(pop_weights)
     })
     threshold <- shiny::reactive({input$threshold})
     type <- shiny::reactive({input$type})
