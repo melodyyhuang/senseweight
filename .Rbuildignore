@@ -3,3 +3,6 @@
 ^README\.Rmd$
 ^senseweight\.Rproj$
 ^LICENSE\.md$
+^app\.R$
+^rsconnect$
+^\.rscignore$

@@ -35,6 +35,8 @@ Imports:
     tidyselect,
     vthemes (>= 0.1.0),
     WeightIt
+Suggests: 
+    pkgload
 Remotes: 
     tiffanymtang/shinyWrappers,
     Yu-Group/vthemes

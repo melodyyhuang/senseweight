@@ -54,7 +54,7 @@ run_app <- function(...) {
   
   # Other Text -----------------------------------------------------------------
   instructions_text <- "TODO: Add instructions here"
-  about_text <- htmltools::HTML("This Shiny app evaluates the sensitivity of omitted variable bias from weighted estimators. We currently consider three common missing data settings that levearge weights to account for missing not at random: (1) survey non-response, (2) generalizing or transporting causal effects (i.e., external validity), and (3) observational causal inference (i.e., internal validity). <br><br>To use the Shiny app, start by selecting the analysis type you are trying to perform and then upload your data in the left sidebar.")
+  about_text <- htmltools::HTML("This Shiny app evaluates the sensitivity of omitted variable bias from weighted estimators. We currently consider three common missing data settings that leverage weights to account for missing not at random: (1) survey non-response, (2) generalizing or transporting causal effects (i.e., external validity), and (3) observational causal inference (i.e., internal validity). <br><br>To use the Shiny app, start by selecting the analysis type you are trying to perform and then upload your data in the left sidebar.")
   
   # UI -------------------------------------------------------------------------
   ui <- shinydashboard::dashboardPage(
@@ -819,7 +819,7 @@ run_app <- function(...) {
     # Run example analysis on startup -----------------------------------------
     default_run <- observeEvent(input$analysis_type, {
       shinyjs::delay(
-        250,
+        300,
         {
           if (input$analysis_type %in% c("experiment", "observational")) {
             shiny::req(
