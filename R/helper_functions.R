@@ -7,12 +7,12 @@
 #' @param sigma2 Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)
 #' @return Estimated bias from omitting a confounder from weights
 #' @export
-estimate_bias<-function(rho, R2, weights, sigma2){
-    if(R2 >= 1 || R2 < 0){
-        return("R2 must be bound on interval [0,1)")
-    }
-    var_eps = var(weights)*R2/(1-R2)
-    return(rho*sqrt(var_eps*sigma2))
+estimate_bias <- function(rho, R2, weights, sigma2) {
+  if (R2 >= 1 || R2 < 0) {
+    return("R2 must be bound on interval [0,1)")
+  }
+  var_eps <- var(weights) * R2 / (1 - R2)
+  return(rho * sqrt(var_eps * sigma2))
 }
 
 #' Generate Correlation
@@ -23,57 +23,60 @@ estimate_bias<-function(rho, R2, weights, sigma2){
 #' @param R2 R^2 measure for how much variation in the true weights is explained by the error term, must be bound on the range \code{[0,1)}
 #' @return Correlation between the error and the weights, based on a user-input \code{R2} value and \code{cor(w,Y)}
 #' @export
-
-generate_rho<-function(rho_w, k, R2){
-    if(R2 >= 1 || R2 < 0){
-        return("R2 must be bound on interval [0,1)")
-    }
-    return(rho_w*sqrt((1-R2)/R2) - (rho_w*k)/sqrt(R2))
+generate_rho <- function(rho_w, k, R2) {
+  if (R2 >= 1 || R2 < 0) {
+    return("R2 must be bound on interval [0,1)")
+  }
+  return(rho_w * sqrt((1 - R2) / R2) - (rho_w * k) / sqrt(R2))
 }
 
 #' Calculate extreme scenario
 #'
-#' Helper function for running an extreme scenario analysis 
+#' Helper function for running an extreme scenario analysis
 #' @param rho_w Estimated correlation between the estimated weights and the outcomes
-#' @param sigma2 Variance of the outcomes 
-#' @param correlations A vector containing possible correlation values between the true weights and the outcomes 
+#' @param sigma2 Variance of the outcomes
+#' @param correlations A vector containing possible correlation values between the true weights and the outcomes
 #' @return A data frame that can be used to generate the extreme scenario plots
 #' @export
-calculate_extreme_scenario<-function(rho_w, sigma2, correlations= c(0.25, 0.5, 0.9, 1)){
-    R2_vals = seq(0.01, 0.99, by=0.01)
-    cor_values = list(NULL)
-    i = 1
-    for(rho in c(-correlations, correlations)){
-        cor_values[[i]] = sapply(R2_vals, generate_rho, rho_w = rho_w, k=rho/rho_w)
-        i = i+1
+calculate_extreme_scenario <- function(rho_w, sigma2, correlations = c(0.25, 0.5, 0.9, 1)) {
+  R2_vals <- seq(0.01, 0.99, by = 0.01)
+  cor_values <- list(NULL)
+  i <- 1
+  for (rho in c(-correlations, correlations)) {
+    cor_values[[i]] <- sapply(R2_vals, generate_rho, rho_w = rho_w, k = rho / rho_w)
+    i <- i + 1
+  }
+  values <- c(-correlations, correlations)
+  names(cor_values) <- paste(values)
+  df_plot <- lapply(
+    1:length(cor_values),
+    function(x) {
+      data.frame(
+        type = values[x], R2_vals,
+        bias = estimate_bias(unlist(cor_values[x]), R2_vals, weights, sigma2),
+        rho = unlist(cor_values[x])
+      )
     }
-    values = c(-correlations, correlations)
-    names(cor_values) = paste(values)
-    df_plot<-lapply(1:length(cor_values),
-        function(x){
-            data.frame(type=values[x], R2_vals,
-                bias = estimate_bias(unlist(cor_values[x]), R2_vals, weights, sigma2),
-                rho= unlist(cor_values[x]))
-        })%>% bind_rows()
+  ) |> bind_rows()
 
-    df_plot = df_plot[which(abs(df_plot$rho) < sqrt(1-rho_w^2)),]
+  df_plot <- df_plot[which(abs(df_plot$rho) < sqrt(1 - rho_w^2)), ]
 
-    find_max = df_plot %>% group_by(type) %>%
-                summarize(
-                    val=max(R2_vals)
-                )
+  find_max <- df_plot |>
+    group_by(type) |>
+    summarize(
+      val = max(R2_vals)
+    )
 
-    df_plot$label = NA
-    for(i in 1:nrow(find_max)){
-        df_plot$label[df_plot$type==find_max$type[i] & df_plot$R2==find_max$val[i]] =
-        paste(find_max$type[i])
-    }
-    df_plot$type_abs = paste(abs(as.numeric(paste(df_plot$type))))
-    df_plot$type_abs = as.factor(df_plot$type_abs)
-    df_plot$type_abs = fct_rev(df_plot$type_abs)
-    #
-    levels(df_plot$type_abs) = paste(abs(df_plot$type)[order(-abs(df_plot$type))])
-    #c("0.9", "0.5", "0.25")
+  df_plot$label <- NA
+  for (i in 1:nrow(find_max)) {
+    df_plot$label[df_plot$type == find_max$type[i] & df_plot$R2 == find_max$val[i]] <-
+      paste(find_max$type[i])
+  }
+  df_plot$type_abs <- paste(abs(as.numeric(paste(df_plot$type))))
+  df_plot$type_abs <- as.factor(df_plot$type_abs)
+  df_plot$type_abs <- fct_rev(df_plot$type_abs)
+  
+  levels(df_plot$type_abs) <- paste(abs(df_plot$type)[order(-abs(df_plot$type))])
 
-    return(df_plot)
+  return(df_plot)
 }

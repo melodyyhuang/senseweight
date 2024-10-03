@@ -12,8 +12,17 @@ contour_plot(
   benchmark = TRUE,
   shade = FALSE,
   shade_var = NULL,
-  print = FALSE,
-  binwidth = NULL
+  shade_fill = "#35a4bf",
+  shade_alpha = 0.25,
+  contour_width = 1,
+  binwidth = NULL,
+  label_size = 0.25,
+  point_size = 1,
+  nudge = 0.05,
+  axis_text_size = 12,
+  axis_title_size = 14,
+  axis_line_width = 1,
+  print = FALSE
 )
 }
 \arguments{
@@ -30,6 +39,26 @@ contour_plot(
 \item{shade}{Flag for whether or not a specific benchmarking covariate (or set of benchmarked covariates) should be shaded a different color (\code{shade = TRUE} indicates that we want to highlight specific variables)}
 
 \item{shade_var}{If \code{shade = TRUE}, this contains either a vector containing the variables we want to highlight}
+
+\item{shade_fill}{Color to fill the highlighted variables. Default is set to \code{"#35a4bf"}.}
+
+\item{shade_alpha}{Alpha value for the fill color. Default is set to \code{0.25}.}
+
+\item{contour_width}{Width of the contour lines. Default is set to \code{1}.}
+
+\item{binwidth}{If set to a numeric value, the function will generate a contour plot with the specified binwidth. Default is set to \code{NULL}.}
+
+\item{label_size}{Size of the labels. Default is set to \code{0.25}.}
+
+\item{point_size}{Size of the points. Default is set to \code{1}.}
+
+\item{nudge}{Nudge value for the labels. Default is set to \code{0.05}.}
+
+\item{axis_text_size}{Size of the axis text. Default is set to \code{12}.}
+
+\item{axis_title_size}{Size of the axis title. Default is set to \code{14}.}
+
+\item{axis_line_width}{Width of the axis lines. Default is set to \code{1}.}
 
 \item{print}{If set to \code{TRUE}, the function will return a list with two elements: \code{plot} which contains the generated bias contour plot, and \code{data}, which provides the data.frame for generating the contour plot. If set to \code{FALSE}, the function will simply generate the bias contour plot. Default is set to \code{FALSE}.}
 }

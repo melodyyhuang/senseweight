@@ -18,7 +18,8 @@ summarize_sensitivity(
   dependent_var = NULL,
   model = NULL,
   outcome_function = NULL,
-  sy_srs = NULL
+  svy_srs = NULL,
+  svy_wt = NULL
 )
 }
 \arguments{
@@ -39,8 +40,6 @@ summarize_sensitivity(
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
 
 \item{pretty}{If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.}
-
-\item{q}{Proportion to evaluate roustness value at. Default at \code{q=1}}
 }
 \value{
 Sensitivity summary

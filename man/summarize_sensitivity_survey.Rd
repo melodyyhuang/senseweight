@@ -4,21 +4,18 @@
 \alias{summarize_sensitivity_survey}
 \title{Sensitivity Summary (for survey weights)}
 \usage{
-summarize_sensitivity_survey(
-  dependent_var,
-  model,
-  outcome_function,
-  svy_srs = NULL,
-  Y = NULL,
-  b_star = 0
-)
+summarize_sensitivity_survey(svy_srs, svy_wt, weights, varY, b_star = 0)
 }
 \arguments{
-\item{dependent_var}{String that provides the name of the outcome variable of interest}
+\item{svy_srs}{Survey object, containing the unweighted survey}
 
-\item{model}{Weighting model (i.e., a calibrate object)}
+\item{svy_wt}{Survey object, containing the weighted survey}
 
-\item{outcome_function}{}
+\item{weights}{A vector, containing the estimated survey weights}
+
+\item{varY}{variance of the outcome}
+
+\item{b_star}{Killer confounder threshold, default set to be zero}
 }
 \description{
 Returns a data.frame or Kable table with summary measures of sensitivity; helper function for main summary function, and allows users to directly input a survey object and a design object

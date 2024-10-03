@@ -43,10 +43,6 @@ run_benchmarking(
 \item{sigma2}{If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.}
 
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
-
-\item{k_sigma}{Relative ability of omitted confounder to explain variation in the true weights. If \code{k_sigma > 1}, then we expect the omitted confounder to explain more variation in the true weights than the benchmarked covariate(s). If \code{k_sigma < 1}, then we expect the omitted confounder to explain less of the variation in the true weights than the benchmarked covariate(s). Default is set to 1.}
-
-\item{k_rho}{Relative correlation of omitted confounder with the outcome. If \code{k_rho > 1}, then we expect the omitted confounder to be more correlated with the outcome than the benchmarked covariate(s). If \code{k_rho < 1}, then we expect the omitted confounder to be less correlated with the outcome than the benchmarked covariate(s). Default is set to 1.}
 }
 \value{
 data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder for the set of pre-specified covariates.

@@ -31,15 +31,14 @@ devtools::install_github("melodyyhuang/senseweight")
 ```{r, echo=FALSE, message=FALSE}
 library(ggplot2)
 library(tidyverse)
-#library(ggrepel)
-#library(metR)
-ggMelody<-theme_minimal() + theme(plot.title = element_text(hjust = 0.5, size = 17, face = "bold"),
-                             axis.text=element_text(size=9), #size = 12
-                             #legend.text=element_text(size=7),
-                             legend.position='bottom', axis.title = element_text(size = 12),
-                             strip.text.x = element_text(size = 12, face='bold'),
-                             strip.text.y = element_text(size = 12, face='bold'),
-                             plot.subtitle=element_text(size = 14, hjust=0.5))
+ggMelody <- theme_minimal() + theme(
+  plot.title = element_text(hjust = 0.5, size = 17, face = "bold"),
+  axis.text = element_text(size = 9),
+  legend.position = "bottom", axis.title = element_text(size = 12),
+  strip.text.x = element_text(size = 12, face = "bold"),
+  strip.text.y = element_text(size = 12, face = "bold"),
+  plot.subtitle = element_text(size = 14, hjust = 0.5)
+)
 theme_set(ggMelody)
 ```
 
@@ -53,60 +52,65 @@ The example below illustrates how to use the `senseweight` package for external 
 ```{r example}
 library(senseweight)
 
-#Load in JTPA data: 
+# Load in JTPA data:
 data(jtpa_women)
 ```
 
 
 ```{r}
-#Summarize sites
-jtpa_women %>%
-    group_by(site) %>%
-        summarize(
-            length(prevearn),
-            mean(prevearn),
-            mean(age),
-            mean(married),
-            mean(hrwage),
-            mean(black),
-            mean(hispanic),
-            mean(hsorged),
-            mean(yrs_educ)
-        )
+# Summarize sites
+jtpa_women |>
+  group_by(site) |>
+  summarize(
+    length(prevearn),
+    across(
+      c(prevearn, age, married, hrwage, black, hispanic, hsorged, yrs_educ), 
+      mean
+    )
+  )
 ```
 
 
 Assume researchers are interested in generalizing the results from the site of Omaha, Nebraska to the other 15 experimental sites: 
 ```{r estimate}
-site_name="NE"
-df_site = jtpa_women[which(jtpa_women$site == site_name),]
-df_else = jtpa_women[which(jtpa_women$site != site_name),]
+site_name <- "NE"
+df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
 
-#Estimate unweighted estimator: 
-model_dim = estimatr::lm_robust(Y~T, data = df_site)
-PATE = coef(lm(Y~T, data = df_else))[2]
-DiM = coef(model_dim)[2]
+# Estimate unweighted estimator:
+model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+PATE <- coef(lm(Y ~ T, data = df_else))[2]
+DiM <- coef(model_dim)[2]
 
-#Generate weights using observed covariates:
-df_all = jtpa_women
-df_all$S = ifelse(jtpa_women$site == "NE", 1, 0)
-model_ps = WeightIt::weightit((1-S)~.-site-T-Y, data = df_all, method='ebal', estimand="ATT")
-weights = model_ps$weights[df_all$S==1]
+# Generate weights using observed covariates:
+df_all <- jtpa_women
+df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+model_ps <- WeightIt::weightit(
+  (1 - S) ~ . - site - T - Y, 
+  data = df_all, method = "ebal", estimand = "ATT"
+)
+weights <- model_ps$weights[df_all$S == 1]
 
-#Estimate IPW model: 
-model_ipw = estimatr::lm_robust(Y~T, data = df_site, weights=weights)
-ipw=coef(model_ipw)[2]
+# Estimate IPW model:
+model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+ipw <- coef(model_ipw)[2]
 
-#Estimate bound for var(tau):
-m = sqrt(var(df_site$Y[df_site$T==1])/var(df_site$Y[df_site$T==0]))
-#Since m > 1:
-vartau = var(df_site$Y[df_site$T==1])-var(df_site$Y[df_site$T==0])
+# Estimate bound for var(tau):
+m <- sqrt(var(df_site$Y[df_site$T == 1]) / var(df_site$Y[df_site$T == 0]))
+# Since m > 1:
+vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
 ```
 
 ### Sensitivity Summary Measures 
 We can generate the sensitivity summary measures using the `summarize_sensitivity` function: 
 ```{r summaries}
-summarize_sensitivity(weights=weights, Y=df_site$Y, Z=df_site$T, sigma2 = vartau, estimand='PATE')
+summarize_sensitivity(
+  weights = weights, 
+  Y = df_site$Y, 
+  Z = df_site$T, 
+  sigma2 = vartau, 
+  estimand = "PATE"
+)
 ```
 
 
@@ -115,32 +119,53 @@ The `summarize_sensitivity` function defaults to evaluating the robustness value
 Individual components of the sensitivity summaries can be computed as well: 
 
 ```{r RV}
-#Calculate robustness value:
-RV = robustness_value(q=1, ipw, vartau, weights)
+# Calculate robustness value:
+RV <- robustness_value(
+  estimate = ipw, b_star = 0, sigma2 = vartau, weights = weights
+)
 print(RV)
 ```
 
 
 ### Formal Benchmarking: 
 ```{r benchmarking}
-#Select weighting variables: 
-weighting_vars = names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
+# Select weighting variables:
+weighting_vars <- names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
 
-#Run bechmarking: 
-df_benchmark = run_benchmarking(weighting_vars, data = df_all[,-1], 
-                 treatment="T", outcome = "Y",selection = "S", 
-                 estimate=ipw, 
-                 RV = RV, sigma2=vartau, 
-                 estimand = "PATE")
+# Run bechmarking:
+df_benchmark <- run_benchmarking(
+  weighting_vars,
+  data = df_all[, -1],
+  treatment = "T", outcome = "Y", selection = "S",
+  estimate = ipw,
+  RV = RV, sigma2 = vartau,
+  estimand = "PATE"
+)
 
 print(df_benchmark)
 ```
 
 ### Generating the Bias Contour Plots 
 ```{r contour_plot, warning=FALSE}
-contour_plot(var(weights), vartau, ipw, df_benchmark, benchmark=TRUE, shade=TRUE,
-    shade_var = c("age", "prevearn"))+
-    geom_point(aes(x = RV, y=sqrt(RV))) +
-    annotate("text", x = RV-0.01, y = sqrt(RV)+0.02, 
-        label=expression(RV[1]*"= 0.41"), hjust=0, vjust=0, size=3)
+contour_plot(
+  var(weights), vartau, ipw, df_benchmark,
+  benchmark = TRUE, shade = TRUE,
+  shade_var = c("age", "prevearn"),
+  label_size = 4
+) +
+  geom_point(aes(x = RV, y = sqrt(RV))) +
+  annotate("text",
+    x = RV - 0.01, y = sqrt(RV) + 0.02,
+    label = expression(RV[1] * "= 0.41"), hjust = 0, vjust = 0, size = 3
+  )
 ```
+
+## Shiny senseweight app
+
+The `senseweight` package also includes a Shiny app that allows users to interactively conduct sensitivity analyses. The app is available [here](https://tiffanymtang.shinyapps.io/senseweight/). The app can also be run locally by running:
+
+```{r eval = FALSE}
+run_app()
+```
+
+[![](man/figures/shinysenseweight.png)](https://tiffanymtang.shinyapps.io/senseweight/)
