@@ -28,6 +28,7 @@ Imports:
     purrr,
     shiny,
     shinydashboard,
+    shinydashboardPlus,
     shinyjs,
     shinyWidgets,
     shinyWrappers (>= 0.0.0.9000),

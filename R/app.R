@@ -57,7 +57,7 @@ run_app <- function(...) {
   about_text <- htmltools::HTML("This Shiny app evaluates the sensitivity of omitted variable bias from weighted estimators. We currently consider three common missing data settings that leverage weights to account for missing not at random: (1) survey non-response, (2) generalizing or transporting causal effects (i.e., external validity), and (3) observational causal inference (i.e., internal validity). <br><br>To use the Shiny app, start by selecting the analysis type you are trying to perform and then upload your data in the left sidebar.")
   
   # UI -------------------------------------------------------------------------
-  ui <- shinydashboard::dashboardPage(
+  ui <- shinydashboardPlus::dashboardPage(
     title = title,
     
     # Header -------------------------------------------------------------------
@@ -68,6 +68,11 @@ run_app <- function(...) {
         `font-variant` = "small-caps", `font-size` = "26px",
         `font-family` = "'Quattrocento Sans'"
       )
+    ),
+    
+    # Footer -------------------------------------------------------------------
+    footer = shinydashboardPlus::dashboardFooter(
+      right = htmltools::HTML("&copy; 2024 Melody Y. Huang and Tiffany M. Tang")
     ),
     
     # Sidebar ------------------------------------------------------------------
@@ -272,6 +277,13 @@ run_app <- function(...) {
         shiny::tags$style(
           shiny::HTML(
             "label.control-label {font-family: 'Quattrocento Sans';};"
+          )
+        )
+      ),
+      shiny::tags$head(
+        shiny::tags$style(
+          shiny::HTML(
+            ".main-footer {background: transparent; color: #a0a0a0; padding: 8px 16px 24px 8px; font-size: 13px;};"
           )
         )
       ),
