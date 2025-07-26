@@ -55,7 +55,7 @@ benchmark <- function(omit, weights, data, sigma2,
 #' @return data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder for the set of pre-specified covariates.
 #' @export
 run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
-                             data, treatment = Z, outcome = Y, selection = S,
+                             data, treatment, outcome, selection,
                              weighting_method = "ebal", weight_max = Inf,
                              estimate, RV, sigma2, estimand = "ATT") {
   names(data)[which(names(data) == paste(outcome))] <- "outcome"

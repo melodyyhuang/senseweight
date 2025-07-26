@@ -33,12 +33,13 @@ generate_rho <- function(rho_w, k, R2) {
 #' Calculate extreme scenario
 #'
 #' Helper function for running an extreme scenario analysis
-#' @param rho_w Estimated correlation between the estimated weights and the outcomes
+#' @param rho_w Estimated correlation between the estimated weights and the outcomes+
+#' @param weights Vector of estimated weights
 #' @param sigma2 Variance of the outcomes
 #' @param correlations A vector containing possible correlation values between the true weights and the outcomes
 #' @return A data frame that can be used to generate the extreme scenario plots
 #' @export
-calculate_extreme_scenario <- function(rho_w, sigma2, correlations = c(0.25, 0.5, 0.9, 1)) {
+calculate_extreme_scenario <- function(rho_w, weights, sigma2, correlations = c(0.25, 0.5, 0.9, 1)) {
   R2_vals <- seq(0.01, 0.99, by = 0.01)
   cor_values <- list(NULL)
   i <- 1

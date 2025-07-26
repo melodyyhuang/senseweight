@@ -4,10 +4,17 @@
 \alias{calculate_extreme_scenario}
 \title{Calculate extreme scenario}
 \usage{
-calculate_extreme_scenario(rho_w, sigma2, correlations = c(0.25, 0.5, 0.9, 1))
+calculate_extreme_scenario(
+  rho_w,
+  weights,
+  sigma2,
+  correlations = c(0.25, 0.5, 0.9, 1)
+)
 }
 \arguments{
-\item{rho_w}{Estimated correlation between the estimated weights and the outcomes}
+\item{rho_w}{Estimated correlation between the estimated weights and the outcomes+}
+
+\item{weights}{Vector of estimated weights}
 
 \item{sigma2}{Variance of the outcomes}
 

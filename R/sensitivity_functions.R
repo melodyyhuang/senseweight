@@ -207,13 +207,14 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
 #'
 #' Generates extreme scenario plots, with varying thresholds for the correlation between the true weights and the outcomes
 #' @param rho_w Correlation between the estimated weights and the outcomes
+#' @param weights Vector of estimated weights
 #' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'
 #' @param estimate Weighted estimate
 #' @param correlations A vector containing possible correlation values between the true weights and the outcomes
 #' @return A ggplot2 object, genearting an extreme scenario analysis
 #' @export
-extreme_scenario_plot <- function(rho_w, sigma2, estimate, correlations = c(0.25, 0.5, 0.9, 1)) {
-  df_plot <- calculate_extreme_scenario(rho_w, sigma2, correlations)
+extreme_scenario_plot <- function(rho_w, weights, sigma2, estimate, correlations = c(0.25, 0.5, 0.9, 1)) {
+  df_plot <- calculate_extreme_scenario(rho_w, weights, sigma2, correlations)
   p1 <- df_plot[which(estimate - df_plot$bias >= 0), ] |>
     ggplot2::ggplot(ggplot2::aes(
       x = .data$R2_vals, y = estimate - .data$bias, label = .data$label,
