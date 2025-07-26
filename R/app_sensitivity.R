@@ -91,9 +91,9 @@ sensitivityFun <- function(input, output, session,
         ) |>
           dplyr::bind_rows() |>
           dplyr::mutate(
-            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / bias)
+            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / .data$bias)
           ) |>
-          dplyr::arrange(MRCS)
+          dplyr::arrange(.data$MRCS)
         
         shade_variables <- df_benchmark$variable[
           df_sensitivity_summary$Estimate - df_benchmark$bias > b_star
@@ -148,9 +148,9 @@ sensitivityFun <- function(input, output, session,
       if (!is.null(sensitivity_results$benchmark_results)) {
         df_benchmark <- sensitivity_results$benchmark_results |>
           dplyr::mutate(
-            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / bias)
+            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / .data$bias)
           ) |>
-          dplyr::arrange(MRCS)
+          dplyr::arrange(.data$MRCS)
         shade_variables <- df_benchmark$variable[
           df_sensitivity_summary$Estimate - df_benchmark$bias > b_star
         ]

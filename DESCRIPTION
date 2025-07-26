@@ -25,6 +25,7 @@ Imports:
     kableExtra,
     metR,
     purrr,
+    rlang,
     shiny,
     shinydashboard,
     shinydashboardPlus,

@@ -215,7 +215,7 @@ generalize_experiment <- function(experiment, target_pop,
     weighting_formula,
     method = weighting_method,
     data = df_all |>
-      dplyr::select(-.Y, -.Z),
+      dplyr::select(-dplyr::all_of(c(".Y", ".Z"))),
     estimand = "ATT"
   )
   wts <- model_ps$weights[df_all$.S == 1]
@@ -292,7 +292,7 @@ run_obs_analysis <- function(data, treatment, outcome, weighting_vars,
   model_ps <- WeightIt::weightit(
     .Z ~ .,
     method = weighting_method,
-    data = data_analysis |> dplyr::select(-.Y),
+    data = data_analysis |> dplyr::select(-dplyr::all_of(".Y")),
     estimand = "ATT"
   )
   wts <- model_ps$weights

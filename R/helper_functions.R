@@ -62,9 +62,9 @@ calculate_extreme_scenario <- function(rho_w, sigma2, correlations = c(0.25, 0.5
   df_plot <- df_plot[which(abs(df_plot$rho) < sqrt(1 - rho_w^2)), ]
 
   find_max <- df_plot |>
-    dplyr::group_by(type) |>
+    dplyr::group_by(.data$type) |>
     dplyr::summarize(
-      val = max(R2_vals)
+      val = max(.data$R2_vals)
     )
 
   df_plot$label <- NA

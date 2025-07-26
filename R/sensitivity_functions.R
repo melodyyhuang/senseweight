@@ -106,11 +106,11 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
   if (benchmark) {
     df_benchmark_plot <- df_benchmark |>
       dplyr::mutate(
-        rho_benchmark = ifelse(abs(rho_benchmark > 1), NA, rho_benchmark)
+        rho_benchmark = ifelse(abs(.data$rho_benchmark > 1), NA, .data$rho_benchmark)
       )
   }
   plt <- df_plot |>
-    ggplot2::ggplot(ggplot2::aes(x = R2, y = rho, z = bias)) +
+    ggplot2::ggplot(ggplot2::aes(x = .data$R2, y = .data$rho, z = .data$bias)) +
     ggplot2::labs(
       x = expression(R[epsilon]^2),
       y = expression(rho[epsilon * "," * tau])
@@ -119,7 +119,7 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
     plt <- plt +
       ggplot2::geom_contour(col = "black", size = contour_width * 0.6) +
       metR::geom_text_contour(
-        ggplot2::aes(z = bias), stroke = contour_stroke
+        ggplot2::aes(z = .data$bias), stroke = contour_stroke
       )
   } else {
     plt <- plt +
@@ -127,7 +127,7 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
         col = "black", binwidth = binwidth, size = contour_width * 0.6
       ) +
       metR::geom_text_contour(
-        ggplot2::aes(z = bias),
+        ggplot2::aes(z = .data$bias),
         stroke = contour_stroke, binwidth = binwidth
       )
   }
@@ -146,17 +146,17 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
       plt <- plt +
         ggplot2::geom_point(
           ggplot2::aes(
-            x = R2_benchmark,
-            y = rho_benchmark,
-            color = (variable %in% shade_var)
+            x = .data$R2_benchmark,
+            y = .data$rho_benchmark,
+            color = (.data$variable %in% shade_var)
           ),
           data = df_benchmark,
           size = point_size
         ) +
         ggrepel::geom_label_repel(
           ggplot2::aes(
-            x = R2_benchmark, y = rho_benchmark, label = variable,
-            color = (variable %in% shade_var)
+            x = .data$R2_benchmark, y = .data$rho_benchmark, label = .data$variable,
+            color = (.data$variable %in% shade_var)
           ),
           size = label_size,
           nudge_y = nudge,
@@ -170,12 +170,12 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
     } else {
       plt <- plt +
         ggplot2::geom_point(
-          ggplot2::aes(x = R2_benchmark, y = rho_benchmark),
+          ggplot2::aes(x = .data$R2_benchmark, y = .data$rho_benchmark),
           data = df_benchmark,
           size = point_size
         ) +
         ggrepel::geom_label_repel(
-          ggplot2::aes(x = R2_benchmark, y = rho_benchmark, label = variable),
+          ggplot2::aes(x = .data$R2_benchmark, y = .data$rho_benchmark, label = .data$variable),
           data = df_benchmark,
           size = label_size,
           nudge_y = nudge
@@ -216,8 +216,8 @@ extreme_scenario_plot <- function(rho_w, sigma2, estimate, correlations = c(0.25
   df_plot <- calculate_extreme_scenario(rho_w, sigma2, correlations)
   p1 <- df_plot[which(estimate - df_plot$bias >= 0), ] |>
     ggplot2::ggplot(ggplot2::aes(
-      x = R2_vals, y = estimate - bias, label = label,
-      group = type, linetype = as.factor(abs(type))
+      x = .data$R2_vals, y = estimate - .data$bias, label = .data$label,
+      group = .data$type, linetype = as.factor(abs(.data$type))
     )) +
     ggplot2::geom_line() +
     ggplot2::geom_hline(yintercept = 0, alpha = 0.5) +
@@ -226,13 +226,13 @@ extreme_scenario_plot <- function(rho_w, sigma2, estimate, correlations = c(0.25
     ggplot2::geom_line(
       data = df_plot[which(estimate - df_plot$bias < 0), ],
       ggplot2::aes(
-        x = R2_vals, y = estimate - bias,
-        group = type, linetype = as.factor(abs(type))
+        x = .data$R2_vals, y = estimate - .data$bias,
+        group = .data$type, linetype = as.factor(abs(.data$type))
       ), color = "red"
     ) +
     ggplot2::geom_text(
       data = df_plot[which(estimate - df_plot$bias < 0), ], 
-      ggplot2::aes(label = label),
+      ggplot2::aes(label = .data$label),
       color = "black", nudge_x = 0.035, size = 3
     ) +
     ggplot2::xlab(expression(R[epsilon]^2)) +
