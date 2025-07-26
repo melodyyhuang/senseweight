@@ -13,7 +13,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 LazyData: true
 Imports: 
     bslib,
@@ -23,7 +23,6 @@ Imports:
     ggrepel,
     htmltools,
     kableExtra,
-    lalonde,
     metR,
     purrr,
     shiny,
@@ -33,7 +32,6 @@ Imports:
     shinyWidgets,
     shinyWrappers (>= 0.0.0.9000),
     survey,
-    tidyselect,
     vthemes (>= 0.1.0),
     WeightIt
 Suggests: 

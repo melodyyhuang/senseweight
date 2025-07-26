@@ -6,3 +6,4 @@
 ^app\.R$
 ^rsconnect$
 ^\.rscignore$
+^data-raw$
