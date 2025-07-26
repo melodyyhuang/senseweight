@@ -1,8 +1,8 @@
 #' Function for creating targets from auxiliary information and formula
 #' @keywords internal
 create_targets <- function(target_design, target_formula) {
-  target_mf <- model.frame(target_formula, model.frame(target_design))
-  target_mm <- model.matrix(target_formula, target_mf)
+  target_mf <- stats::model.frame(target_formula, stats::model.frame(target_design))
+  target_mm <- stats::model.matrix(target_formula, target_mf)
   wts <- stats::weights(target_design)
   if (all(wts == 1)) {
     return(colMeans(target_mm))
@@ -46,7 +46,7 @@ generate_survey_objects <- function(sample_data, population_data,
   } else {
     Y_recode <- sample_data$.outcome
   }
-  varY <- var(Y_recode)
+  varY <- stats::var(Y_recode)
   if (!is.null(pop_weights)) {
     population_data$.weights <- pop_weights
   } else {
@@ -62,7 +62,7 @@ generate_survey_objects <- function(sample_data, population_data,
   )
   
   # Set up weighting formula:
-  formula_weight <- as.formula(paste("~", paste(covariates, collapse = "+")))
+  formula_weight <- stats::as.formula(paste("~", paste(covariates, collapse = "+")))
   
   # Generate targets:
   survey_targets <- create_targets(sample_svy, formula_weight)
@@ -169,7 +169,7 @@ generalize_experiment <- function(experiment, target_pop,
   if (any(is.na(df_sample))) {
     n_orig <- nrow(df_sample)
     n_na <- sum(rowSums(is.na(df_sample)) > 0)
-    df_sample <- na.omit(df_sample)
+    df_sample <- stats::na.omit(df_sample)
     msgs_ls <- c(
       msgs_ls,
       list(
@@ -185,7 +185,7 @@ generalize_experiment <- function(experiment, target_pop,
   if (any(is.na(df_pop))) {
     n_orig <- nrow(df_pop)
     n_na <- sum(rowSums(is.na(df_pop)) > 0)
-    df_pop <- na.omit(df_pop)
+    df_pop <- stats::na.omit(df_pop)
     msgs_ls <- c(
       msgs_ls,
       list(
@@ -207,7 +207,7 @@ generalize_experiment <- function(experiment, target_pop,
     dplyr::mutate(.S = 0)
   df_all <- rbind(df_sample, df_pop)
   
-  weighting_formula <- as.formula(
+  weighting_formula <- stats::as.formula(
     paste("1 - .S ~", paste(covariates_overlap, collapse = "+"), sep = "")
   )
   
@@ -215,21 +215,21 @@ generalize_experiment <- function(experiment, target_pop,
     weighting_formula,
     method = weighting_method,
     data = df_all |>
-      dplyr::select(-.Y, -.Z),
+      dplyr::select(-dplyr::all_of(c(".Y", ".Z"))),
     estimand = "ATT"
   )
   wts <- model_ps$weights[df_all$.S == 1]
   wts <- wts / mean(wts)  # center at mean 1
   
   model_ipw <- estimatr::lm_robust(.Y ~ .Z, data = df_sample, weights = wts)
-  ipw <- coef(model_ipw)[2]
+  ipw <- stats::coef(model_ipw)[2]
   ipw_se <- model_ipw$std.error[2]
   p_value <- model_ipw$p.value[2]
-  var_tau <- var(df_sample$.Y[df_sample$.Z == 1]) -
-    var(df_sample$.Y[df_sample$.Z==0])
+  var_tau <- stats::var(df_sample$.Y[df_sample$.Z == 1]) -
+    stats::var(df_sample$.Y[df_sample$.Z==0])
   if (var_tau < 0 || is.na(var_tau)) {
-    var_tau <- var(df_sample$.Y[df_sample$.Z == 1]) +
-      var(df_sample$.Y[df_sample$.Z == 0])
+    var_tau <- stats::var(df_sample$.Y[df_sample$.Z == 1]) +
+      stats::var(df_sample$.Y[df_sample$.Z == 0])
   }
   
   sensitivity_summary <- summarize_sensitivity(
@@ -280,7 +280,7 @@ run_obs_analysis <- function(data, treatment, outcome, weighting_vars,
   if (any(is.na(data_analysis))) {
     n_orig <- nrow(data_analysis)
     n_na <- sum(rowSums(is.na(data_analysis)) > 0)
-    data_analysis <- na.omit(data_analysis)
+    data_analysis <- stats::na.omit(data_analysis)
     msgs_ls <- c(
       msgs_ls,
       list(
@@ -292,7 +292,7 @@ run_obs_analysis <- function(data, treatment, outcome, weighting_vars,
   model_ps <- WeightIt::weightit(
     .Z ~ .,
     method = weighting_method,
-    data = data_analysis |> dplyr::select(-.Y),
+    data = data_analysis |> dplyr::select(-dplyr::all_of(".Y")),
     estimand = "ATT"
   )
   wts <- model_ps$weights
@@ -300,11 +300,11 @@ run_obs_analysis <- function(data, treatment, outcome, weighting_vars,
     mean(wts[data_analysis$.Z == 0])  # center at mean 1
   
   model_ipw <- estimatr::lm_robust(.Y ~ .Z, data = data_analysis, weights = wts)
-  ipw <- coef(model_ipw)[2]
+  ipw <- stats::coef(model_ipw)[2]
   ipw_se <- model_ipw$std.error[2]
   p_value <- model_ipw$p.value[2]
   
-  varY <- var(data_analysis$.Y[data_analysis$.Z == 0])
+  varY <- stats::var(data_analysis$.Y[data_analysis$.Z == 0])
   sensitivity_summary <- summarize_sensitivity(
     weights = wts,
     Y = data_analysis$.Y,

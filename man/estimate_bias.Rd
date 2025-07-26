@@ -13,11 +13,15 @@ estimate_bias(rho, R2, weights, sigma2)
 
 \item{weights}{Vector of estimated weights}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)}
 }
 \value{
 Estimated bias from omitting a confounder from weights
 }
 \description{
 Returns the bias based on the different parameters in the bias decomposition
+}
+\examples{
+# TODO
+
 }

@@ -29,6 +29,8 @@ summarize_sensitivity(
 
 \item{Z}{Treatment assignment}
 
+\item{b_star}{TODO (document me!)}
+
 \item{estimate}{(Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}}
 
 \item{SE}{(Optional) Standard error associated with the weighted point estimate}
@@ -40,10 +42,23 @@ summarize_sensitivity(
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
 
 \item{pretty}{If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.}
+
+\item{dependent_var}{TODO (document me!)}
+
+\item{model}{TODO (document me!)}
+
+\item{outcome_function}{TODO (document me!)}
+
+\item{svy_srs}{TODO (document me!)}
+
+\item{svy_wt}{TODO (document me!)}
 }
 \value{
 Sensitivity summary
 }
 \description{
 Returns a data.frame or Kable table with summary measures of sensitivity
+}
+\examples{
+# TODO
 }

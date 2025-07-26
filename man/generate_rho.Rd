@@ -14,8 +14,11 @@ generate_rho(rho_w, k, R2)
 \item{R2}{R^2 measure for how much variation in the true weights is explained by the error term, must be bound on the range \code{[0,1)}}
 }
 \value{
-Correlation between the error and the weights, based on a user-input \code{R2} value and \code{cor(w,Y)}
+Correlation between the error and the weights, based on a user-input \code{R2} value and \code{stats::cor(w,Y)}
 }
 \description{
 Returns the correlation between the error and the weights, using a user-inputted \code{R2} value, the correlation between the estimated weights and outcomes, and a scaling factor
+}
+\examples{
+# TODO
 }

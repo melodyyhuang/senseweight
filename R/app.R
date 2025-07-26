@@ -5,15 +5,20 @@
 #' @returns A shiny application
 #' 
 #' @export
+#' 
+#' @examples
+#' if (interactive()) {
+#'  run_app()
+#' }
 run_app <- function(...) {
   
-  experiment_sample <- jtpa_women |>
-    dplyr::filter(site == "NE")
-  experiment_pop <- jtpa_women |>
-    dplyr::filter(site != "NE")
+  experiment_sample <- senseweight::jtpa_women |>
+    dplyr::filter(.data$site == "NE")
+  experiment_pop <- senseweight::jtpa_women |>
+    dplyr::filter(.data$site != "NE")
   
   lalonde_robust <- senseweight::nsw_dw |>
-    dplyr::filter(treat == 1) |>
+    dplyr::filter(.data$treat == 1) |>
     dplyr::bind_rows(senseweight::psid_controls)
   
   options(shiny.maxRequestSize = 100 * 1024^2)
@@ -353,7 +358,7 @@ run_app <- function(...) {
     # Update inputs ------------------------------------------------------------
     ## Update data input -------------------------------------------------------
     sampleDataInput <- shinyWrappers::fileInputServer(
-      "sample_data", default_data = wapo
+      "sample_data", default_data = senseweight::wapo
     )
     experimentDataInput <- shinyWrappers::fileInputServer(
       "experiment_data", default_data = experiment_sample
@@ -363,7 +368,7 @@ run_app <- function(...) {
     )
     populationSurveyDataInput <- shinyWrappers::fileInputServer(
       "population_data_survey",
-      default_data = ces
+      default_data = senseweight::ces
     )
     populationExperimentDataInput <- shinyWrappers::fileInputServer(
       "population_data_experiment",
@@ -479,7 +484,7 @@ run_app <- function(...) {
         session, "var_interpret", choices = weightingVars()
       )
       benchmark_df <- get_benchmarking_table() |>
-        dplyr::arrange(MRCS)
+        dplyr::arrange(.data$MRCS)
       shinyWidgets::updatePickerInput(
         session, "var_interpret",
         choices = weightingVars(),
@@ -544,7 +549,7 @@ run_app <- function(...) {
     })
     
     ## Warning Messages --------------------------------------------------------
-    warning_text <- reactive({
+    warning_text <- shiny::reactive({
       results <- doSensitivity()
       out <- NULL
       if (!is.null(results$warning_messages)) {
@@ -572,7 +577,7 @@ run_app <- function(...) {
     })
     
     ## Benchmarking (contour) plot ---------------------------------------------
-    get_benchmarking_plot <- reactive({
+    get_benchmarking_plot <- shiny::reactive({
       # require(ggplot2)
       results <- doSensitivity()
       plt <- contour_plot(
@@ -623,7 +628,7 @@ run_app <- function(...) {
     )
     
     ## Summary table -----------------------------------------------------------
-    get_summary_table <- reactive({
+    get_summary_table <- shiny::reactive({
       results <- doSensitivity()
       digits <- input$`summary-display_digits`
       sigfig <- input$`summary-display_sigfigs`
@@ -639,15 +644,15 @@ run_app <- function(...) {
               dplyr::everything(),
               ~ formatC(.x, digits = digits, format = dig_format, flag = "#")
             ),
-            `Unweighted Estimate` = sprintf(
-              "%s (%s)", Unweighted, Unweighted_SE
+            .data[["Unweighted Estimate"]] := sprintf(
+              "%s (%s)", .data$Unweighted, .data$Unweighted_SE
             ),
-            `Weighted Estimate` = sprintf(
-              "%s (%s)", Estimate, SE
+            .data[["Weighted Estimate"]] := sprintf(
+              "%s (%s)", .data$Estimate, .data$SE
             )
           ) |>
           dplyr::select(
-            `Unweighted Estimate`, `Weighted Estimate`, RV
+            dplyr::all_of(c("Unweighted Estimate", "Weighted Estimate", "RV"))
           )
       } else {
         results$df_sensitivity_summary |>
@@ -656,19 +661,19 @@ run_app <- function(...) {
               dplyr::everything(),
               ~ formatC(.x, digits = digits, format = dig_format, flag = "#")
             ),
-            `Unweighted Estimate` = sprintf(
-              "%s (%s)", Unweighted, Unweighted_SE
+            .data[["Unweighted Estimate"]] := sprintf(
+              "%s (%s)", .data$Unweighted, .data$Unweighted_SE
             ),
-            `Weighted Estimate` = sprintf(
-              "%s (%s)", Estimate, SE
+            .data[["Weighted Estimate"]] := sprintf(
+              "%s (%s)", .data$Estimate, .data$SE
             )
           ) |>
           dplyr::select(
-            `Unweighted Estimate`, `Weighted Estimate`, RV
+            dplyr::all_of(c("Unweighted Estimate", "Weighted Estimate", "RV"))
           )
       }
     })
-    summary_table_caption <- reactive({
+    summary_table_caption <- shiny::reactive({
       rv <- get_summary_table()$RV[[1]]
       
       digits <- input$`summary-display_digits`
@@ -741,22 +746,24 @@ run_app <- function(...) {
       filename = "summary_table.csv",
       content = function(file) {
         tab <- get_summary_table()
-        write.csv(tab, file, row.names = FALSE)
+        utils::write.csv(tab, file, row.names = FALSE)
       }
     )
     
     ## Benchmarking table ------------------------------------------------------
-    get_benchmarking_table <- reactive({
+    get_benchmarking_table <- shiny::reactive({
       results <- doSensitivity()
       tab <- results$df_benchmark
-      req(tab)
+      shiny::req(tab)
       tab <- tab |>
         dplyr::select(
-          Variable = variable,
-          `Benchmarked R-squared` = R2_benchmark,
-          `Benchmarked rho` = rho_benchmark,
-          `Estimated Bias` = bias,
-          `MRCS` = MRCS
+          dplyr::all_of(c(
+            `Variable` = "variable",
+            `Benchmarked R-squared` = "R2_benchmark",
+            `Benchmarked rho` = "rho_benchmark",
+            `Estimated Bias` = "bias",
+            `MRCS` = "MRCS"
+          ))
         )
     })
     shinyWrappers::tableServer(
@@ -772,16 +779,16 @@ run_app <- function(...) {
       filename = "benchmarking_table.csv",
       content = function(file) {
         tab <- get_benchmarking_table()
-        write.csv(tab, file, row.names = FALSE)
+        utils::write.csv(tab, file, row.names = FALSE)
       }
     )
     
     ## Interpretation of results -----------------------------------------------
-    interpretation_text <- reactive({
+    interpretation_text <- shiny::reactive({
       shiny::req(var_interpret())
       benchmark_df <- get_benchmarking_table() |>
-        dplyr::arrange(MRCS) |>
-        dplyr::filter(Variable == !!var_interpret())
+        dplyr::arrange(.data$MRCS) |>
+        dplyr::filter(.data$Variable == !!var_interpret())
       
       digits <- input$`benchmarking-display_digits`
       if (isTRUE(is.na(digits))) {
@@ -843,7 +850,7 @@ run_app <- function(...) {
     )
     
     # Run example analysis on startup -----------------------------------------
-    default_run <- observeEvent(input$analysis_type, {
+    default_run <- shiny::observeEvent(input$analysis_type, {
       shinyjs::delay(
         300,
         {

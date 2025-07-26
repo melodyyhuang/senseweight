@@ -28,7 +28,7 @@ contour_plot(
 \arguments{
 \item{varW}{Variance of the estimated weights}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)#'}
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'}
 
 \item{killer_confounder}{Threshold for bias considered large enough to be a killer confounder. For example, if researchers are concerned about the bias large enough to reduce an estimated treatment effect to zero or change directional sign, set \code{killer_confounder} equal to the point estimate.}
 
@@ -67,4 +67,7 @@ A ggplot2 object, containing the bias contour plot
 }
 \description{
 Generates bias contour plots to aid with sensitivity analysis
+}
+\examples{
+# TODO
 }

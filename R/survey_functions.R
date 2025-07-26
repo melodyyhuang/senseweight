@@ -1,12 +1,18 @@
 #' Sensitivity Summary (for survey weights)
 #'
 #' Returns a data.frame or Kable table with summary measures of sensitivity; helper function for main summary function, and allows users to directly input a survey object and a design object
+#' 
 #' @param svy_srs Survey object, containing the unweighted survey
 #' @param svy_wt Survey object, containing the weighted survey
 #' @param weights A vector, containing the estimated survey weights
 #' @param varY variance of the outcome
 #' @param b_star Killer confounder threshold, default set to be zero
+#' 
+#' @return Sensitivity data.frame or latex table with summary measures of sensitivity
 #' @export
+#' 
+#' @examples
+#' # TODO
 summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star = 0) {
   estimate_srs <- as.data.frame(svy_srs)[, 1]
   estimate_srs_se <- as.data.frame(svy_srs)[, 2]
@@ -33,6 +39,7 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #' Benchmark (for survey weights)
 #'
 #' Returns benchmarking results for survey weighting
+#' 
 #' @param omit Variable to benchmark
 #' @param formula Raking formula
 #' @param weights A vector, containing the estimated survey weights
@@ -40,14 +47,18 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #' @param pop_svy Survey object, containing the population the survey sample is being re-weighted to
 #' @param Y outcome of interest
 #' @param weighting_method Weighting method (default to raking)
+#' 
 #' @return Benchmarking results for a variable (or subset of variables)
 #' @export
+#' 
+#' @examples
+#' # TODO
 benchmark_survey <- function(omit, formula, weights, pop_svy,
                              sample_svy, Y, weighting_method) {
   if (length(all.vars(formula)) == 1) {
     return(NULL)
   }
-  formula_benchmark <- as.formula(paste0(
+  formula_benchmark <- stats::as.formula(paste0(
     "~",
     paste0(all.vars(formula)[-which(all.vars(formula) %in% omit)],
       collapse = " + "
@@ -73,7 +84,7 @@ benchmark_survey <- function(omit, formula, weights, pop_svy,
       weights,
       weights_benchmark,
       Y = Y,
-      sigma2 = var(Y),
+      sigma2 = stats::var(Y),
       estimand = "Survey"
     )
   ))

@@ -35,3 +35,6 @@ Benchmarking results for a variable (or subset of variables)
 \description{
 Returns benchmarking results for survey weighting
 }
+\examples{
+# TODO
+}

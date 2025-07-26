@@ -22,6 +22,60 @@
 #' @source \url{https://www.upjohn.org/data-tools/employment-research-data-center/national-jtpa-study}
 "jtpa_women"
 
+#' Cooperative Election Survey
+#' 
+#' A dataset containing TODO (document the goal of the data)
+#' 
+#' @name ces
+#' 
+#' @description
+#' - `pid`: party indicator, one of `c('Democrat', 'Republican', 'Independent', 'Other')`
+#' - `educ`: education level, one of `c('High School or Less', 'Some college', 'College', 'Post-grad')`
+#' - `age`: age of the individual
+#' - `age_buckets`: grouped age buckets, one of `c('18to35', '36to50', '51to64', 'Over65')`
+#' - `bornagain`: indicator for whether the individual identifies as born-again Christian, one of `c('Yes', 'No')`
+#' - `gender`: categorical gender, one of `c('Men', 'Women')`
+#' - `race`: categorical race, one of `c('White', 'Black', 'Hispanic', 'Asian', 'Other')`
+#' - `vvweight_post`: post-election verified voter weight for the individual
+#' 
+#' @references
+#' TODO (document where you got this from)
+#' 
+#' @usage
+#' data('ces')
+#' 
+#' @examples
+#' data('ces')
+NULL
+
+#' Washington Post TODO (what is this)
+#' 
+#' A dataset containing data from the WaPo on TODO (document the goal of the data)
+#' 
+#' @name wapo
+#' 
+#' @description
+#' - `candidate`: candidate indicator, one of `c(0, 1)`
+#' - `pid`: party indicator, one of `c('Democrat', 'Republican', 'Independent', 'Other')`
+#' - `educ`: education level, one of `c('High School or Less', 'Some college', 'College', 'Post-grad')`
+#' - `age`: age of the individual
+#' - `age_buckets`: grouped age buckets, one of `c('18to35', '36to50', '51to64', 'Over65')` 
+#' - `bornagain`: indicator for whether the individual identifies as born-again Christian, one of `c('Yes', 'No')`
+#' - `gender`: categorical gender, one of `c('Men', 'Women')`
+#' - `race`: categorical race, one of `c('White', 'Black', 'Hispanic', 'Asian', 'Other')`
+#' - `weight`: survey weight
+#' - `political_interest`: binary indicator for political interest
+#' - `political_interest_full`: full political interest, one of `c('Not so closely', 'Somewhat closely', 'Very closely')`
+#' 
+#' @references
+#' TODO (document where you got this from)
+#' 
+#' @usage
+#' data('wapo')
+#' 
+#' @examples
+#' data('wapo')
+NULL
 
 #' Lalonde Experimental Data
 #' 

@@ -91,9 +91,9 @@ sensitivityFun <- function(input, output, session,
         ) |>
           dplyr::bind_rows() |>
           dplyr::mutate(
-            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / bias)
+            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / .data$bias)
           ) |>
-          dplyr::arrange(MRCS)
+          dplyr::arrange(.data$MRCS)
         
         shade_variables <- df_benchmark$variable[
           df_sensitivity_summary$Estimate - df_benchmark$bias > b_star
@@ -108,8 +108,8 @@ sensitivityFun <- function(input, output, session,
       }
       # Outputs all info to create benchmarking table, summary table, and plot via contour_plot()
       out <- list(
-        varW = var(survey_objs$weights),
-        sigma2 = var(data[[response_var]]),
+        varW = stats::var(survey_objs$weights),
+        sigma2 = stats::var(data[[response_var]]),
         killer_confounder = df_sensitivity_summary$Estimate - b_star,
         df_benchmark = df_benchmark,
         benchmark = benchmark,
@@ -148,9 +148,9 @@ sensitivityFun <- function(input, output, session,
       if (!is.null(sensitivity_results$benchmark_results)) {
         df_benchmark <- sensitivity_results$benchmark_results |>
           dplyr::mutate(
-            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / bias)
+            MRCS = abs((df_sensitivity_summary$Estimate - b_star) / .data$bias)
           ) |>
-          dplyr::arrange(MRCS)
+          dplyr::arrange(.data$MRCS)
         shade_variables <- df_benchmark$variable[
           df_sensitivity_summary$Estimate - df_benchmark$bias > b_star
         ]
@@ -165,7 +165,7 @@ sensitivityFun <- function(input, output, session,
       
       # Outputs all info to create benchmarking table, summary table, and plot via contour_plot()
       out <- list(
-        varW = var(sensitivity_results$weights),
+        varW = stats::var(sensitivity_results$weights),
         sigma2 = sensitivity_results$sigma2,
         killer_confounder = df_sensitivity_summary$Estimate - b_star,
         df_benchmark = df_benchmark,

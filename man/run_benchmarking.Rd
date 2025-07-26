@@ -8,9 +8,9 @@ run_benchmarking(
   weighting_vars,
   benchmark_vars = "all",
   data,
-  treatment = Z,
-  outcome = Y,
-  selection = S,
+  treatment,
+  outcome,
+  selection,
   weighting_method = "ebal",
   weight_max = Inf,
   estimate,
@@ -49,4 +49,7 @@ data.frame containing the benchmarked parameter values, the estimated bias, MRCS
 }
 \description{
 Wrapper function to run formal benchmarking on a set of pre-specified covariates. Returns a data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder.
+}
+\examples{
+# TODO
 }

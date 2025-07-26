@@ -11,7 +11,7 @@ robustness_value(estimate, b_star = 0, sigma2, weights)
 
 \item{b_star}{Threshold that corresponds to a substantively meaningful change to the research conclusion. For example, a value of 0 denotes that the bias from omitting a variable was sufficiently large to change the estimate to zero.}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)}
 
 \item{weights}{Vector of estimated weights}
 }
@@ -20,4 +20,7 @@ Robustness value for a specified proportion change
 }
 \description{
 Returns the estimated robustness value, for a specified proportion change
+}
+\examples{
+# TODO
 }

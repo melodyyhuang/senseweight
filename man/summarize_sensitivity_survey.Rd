@@ -17,6 +17,12 @@ summarize_sensitivity_survey(svy_srs, svy_wt, weights, varY, b_star = 0)
 
 \item{b_star}{Killer confounder threshold, default set to be zero}
 }
+\value{
+Sensitivity data.frame or latex table with summary measures of sensitivity
+}
 \description{
 Returns a data.frame or Kable table with summary measures of sensitivity; helper function for main summary function, and allows users to directly input a survey object and a design object
+}
+\examples{
+# TODO
 }

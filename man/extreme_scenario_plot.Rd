@@ -6,6 +6,7 @@
 \usage{
 extreme_scenario_plot(
   rho_w,
+  weights,
   sigma2,
   estimate,
   correlations = c(0.25, 0.5, 0.9, 1)
@@ -14,7 +15,9 @@ extreme_scenario_plot(
 \arguments{
 \item{rho_w}{Correlation between the estimated weights and the outcomes}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)#'}
+\item{weights}{Vector of estimated weights}
+
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'}
 
 \item{estimate}{Weighted estimate}
 
@@ -25,4 +28,7 @@ A ggplot2 object, genearting an extreme scenario analysis
 }
 \description{
 Generates extreme scenario plots, with varying thresholds for the correlation between the true weights and the outcomes
+}
+\examples{
+# TODO
 }

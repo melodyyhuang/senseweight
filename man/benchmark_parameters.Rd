@@ -28,7 +28,7 @@ benchmark_parameters(
 
 \item{Z}{Vector of treatment assignment (Only necessary if \code{estimand = "PATE"} in order to estimate covariances)}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)}
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)}
 
 \item{estimand}{String specifying the estimand of interest. Valid inputs are "PATE", "Augmented", "ATT", or "Survey".}
 }
@@ -37,4 +37,7 @@ benchmark_parameters(
 }
 \description{
 Returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
+}
+\examples{
+# TODO
 }
