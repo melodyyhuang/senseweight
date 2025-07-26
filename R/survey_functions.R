@@ -47,7 +47,7 @@ benchmark_survey <- function(omit, formula, weights, pop_svy,
   if (length(all.vars(formula)) == 1) {
     return(NULL)
   }
-  formula_benchmark <- as.formula(paste0(
+  formula_benchmark <- stats::as.formula(paste0(
     "~",
     paste0(all.vars(formula)[-which(all.vars(formula) %in% omit)],
       collapse = " + "
@@ -73,7 +73,7 @@ benchmark_survey <- function(omit, formula, weights, pop_svy,
       weights,
       weights_benchmark,
       Y = Y,
-      sigma2 = var(Y),
+      sigma2 = stats::var(Y),
       estimand = "Survey"
     )
   ))

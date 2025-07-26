@@ -7,9 +7,9 @@
 #' @export
 run_app <- function(...) {
   
-  experiment_sample <- jtpa_women |>
+  experiment_sample <- senseweight::jtpa_women |>
     dplyr::filter(site == "NE")
-  experiment_pop <- jtpa_women |>
+  experiment_pop <- senseweight::jtpa_women |>
     dplyr::filter(site != "NE")
   
   lalonde_robust <- senseweight::nsw_dw |>
@@ -353,7 +353,7 @@ run_app <- function(...) {
     # Update inputs ------------------------------------------------------------
     ## Update data input -------------------------------------------------------
     sampleDataInput <- shinyWrappers::fileInputServer(
-      "sample_data", default_data = wapo
+      "sample_data", default_data = senseweight::wapo
     )
     experimentDataInput <- shinyWrappers::fileInputServer(
       "experiment_data", default_data = experiment_sample
@@ -363,7 +363,7 @@ run_app <- function(...) {
     )
     populationSurveyDataInput <- shinyWrappers::fileInputServer(
       "population_data_survey",
-      default_data = ces
+      default_data = senseweight::ces
     )
     populationExperimentDataInput <- shinyWrappers::fileInputServer(
       "population_data_experiment",
@@ -544,7 +544,7 @@ run_app <- function(...) {
     })
     
     ## Warning Messages --------------------------------------------------------
-    warning_text <- reactive({
+    warning_text <- shiny::reactive({
       results <- doSensitivity()
       out <- NULL
       if (!is.null(results$warning_messages)) {
@@ -572,7 +572,7 @@ run_app <- function(...) {
     })
     
     ## Benchmarking (contour) plot ---------------------------------------------
-    get_benchmarking_plot <- reactive({
+    get_benchmarking_plot <- shiny::reactive({
       # require(ggplot2)
       results <- doSensitivity()
       plt <- contour_plot(
@@ -623,7 +623,7 @@ run_app <- function(...) {
     )
     
     ## Summary table -----------------------------------------------------------
-    get_summary_table <- reactive({
+    get_summary_table <- shiny::reactive({
       results <- doSensitivity()
       digits <- input$`summary-display_digits`
       sigfig <- input$`summary-display_sigfigs`
@@ -668,7 +668,7 @@ run_app <- function(...) {
           )
       }
     })
-    summary_table_caption <- reactive({
+    summary_table_caption <- shiny::reactive({
       rv <- get_summary_table()$RV[[1]]
       
       digits <- input$`summary-display_digits`
@@ -741,12 +741,12 @@ run_app <- function(...) {
       filename = "summary_table.csv",
       content = function(file) {
         tab <- get_summary_table()
-        write.csv(tab, file, row.names = FALSE)
+        utils::write.csv(tab, file, row.names = FALSE)
       }
     )
     
     ## Benchmarking table ------------------------------------------------------
-    get_benchmarking_table <- reactive({
+    get_benchmarking_table <- shiny::reactive({
       results <- doSensitivity()
       tab <- results$df_benchmark
       req(tab)
@@ -772,12 +772,12 @@ run_app <- function(...) {
       filename = "benchmarking_table.csv",
       content = function(file) {
         tab <- get_benchmarking_table()
-        write.csv(tab, file, row.names = FALSE)
+        utils::write.csv(tab, file, row.names = FALSE)
       }
     )
     
     ## Interpretation of results -----------------------------------------------
-    interpretation_text <- reactive({
+    interpretation_text <- shiny::reactive({
       shiny::req(var_interpret())
       benchmark_df <- get_benchmarking_table() |>
         dplyr::arrange(MRCS) |>

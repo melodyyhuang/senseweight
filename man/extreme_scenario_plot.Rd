@@ -14,7 +14,7 @@ extreme_scenario_plot(
 \arguments{
 \item{rho_w}{Correlation between the estimated weights and the outcomes}
 
-\item{sigma2}{Estimated variance of the outcome (i.e., var(Y) for obervational setting; var(tau) for generalization setting)#'}
+\item{sigma2}{Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'}
 
 \item{estimate}{Weighted estimate}
 

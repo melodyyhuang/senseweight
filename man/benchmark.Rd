@@ -21,6 +21,8 @@ benchmark(
 
 \item{data}{data.frame containing outcomes and covariate infromation}
 
+\item{sigma2}{TODO document me!}
+
 \item{weighting_method}{Weighting method. Supports weighting methods from the package \code{WeightIt}.}
 
 \item{weight_max}{Maximum weight to trim at. Default set to \code{Inf}}
