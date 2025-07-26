@@ -164,7 +164,7 @@ generalize_experiment <- function(experiment, target_pop,
   ) |>
     cbind(
       experiment |>
-        dplyr::select(tidyselect::all_of(covariates))
+        dplyr::select(dplyr::all_of(covariates))
     )
   if (any(is.na(df_sample))) {
     n_orig <- nrow(df_sample)
@@ -181,7 +181,7 @@ generalize_experiment <- function(experiment, target_pop,
   # Choose population:
   df_pop <- target_pop |>
     dplyr::filter(!!filters) |>
-    dplyr::select(tidyselect::all_of(covariates))
+    dplyr::select(dplyr::all_of(covariates))
   if (any(is.na(df_pop))) {
     n_orig <- nrow(df_pop)
     n_na <- sum(rowSums(is.na(df_pop)) > 0)
@@ -200,10 +200,10 @@ generalize_experiment <- function(experiment, target_pop,
   msgs_ls <- c(msgs_ls, covariates_overlap_out$warning_messages)
   
   df_sample <- df_sample |>
-    dplyr::select(tidyselect::all_of(c(".Y", ".Z", covariates_overlap))) |>
+    dplyr::select(dplyr::all_of(c(".Y", ".Z", covariates_overlap))) |>
     dplyr::mutate(.S = 1)
   df_pop <- df_pop |>
-    dplyr::select(tidyselect::all_of(c(".Y", ".Z", covariates_overlap))) |>
+    dplyr::select(dplyr::all_of(c(".Y", ".Z", covariates_overlap))) |>
     dplyr::mutate(.S = 0)
   df_all <- rbind(df_sample, df_pop)
   
@@ -275,7 +275,7 @@ run_obs_analysis <- function(data, treatment, outcome, weighting_vars,
   ) |>
     cbind(
       data |>
-        dplyr::select(tidyselect::all_of(weighting_vars))
+        dplyr::select(dplyr::all_of(weighting_vars))
     )
   if (any(is.na(data_analysis))) {
     n_orig <- nrow(data_analysis)

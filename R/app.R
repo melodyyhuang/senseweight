@@ -12,10 +12,9 @@ run_app <- function(...) {
   experiment_pop <- jtpa_women |>
     dplyr::filter(site != "NE")
   
-  lalonde_robust <- lalonde::nsw_dw |>
+  lalonde_robust <- senseweight::nsw_dw |>
     dplyr::filter(treat == 1) |>
-    dplyr::bind_rows(lalonde::psid_controls) |>
-    dplyr::select(-data_id)
+    dplyr::bind_rows(senseweight::psid_controls)
   
   options(shiny.maxRequestSize = 100 * 1024^2)
   
@@ -637,7 +636,7 @@ run_app <- function(...) {
         out <- results$df_sensitivity_summary |>
           dplyr::mutate(
             dplyr::across(
-              tidyselect::everything(),
+              dplyr::everything(),
               ~ formatC(.x, digits = digits, format = dig_format, flag = "#")
             ),
             `Unweighted Estimate` = sprintf(
@@ -654,7 +653,7 @@ run_app <- function(...) {
         results$df_sensitivity_summary |>
           dplyr::mutate(
             dplyr::across(
-              tidyselect::everything(),
+              dplyr::everything(),
               ~ formatC(.x, digits = digits, format = dig_format, flag = "#")
             ),
             `Unweighted Estimate` = sprintf(
