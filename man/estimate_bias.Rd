@@ -21,3 +21,7 @@ Estimated bias from omitting a confounder from weights
 \description{
 Returns the bias based on the different parameters in the bias decomposition
 }
+\examples{
+# TODO
+
+}

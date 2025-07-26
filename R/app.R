@@ -5,6 +5,11 @@
 #' @returns A shiny application
 #' 
 #' @export
+#' 
+#' @examples
+#' if (interactive()) {
+#'  run_app()
+#' }
 run_app <- function(...) {
   
   experiment_sample <- senseweight::jtpa_women |>

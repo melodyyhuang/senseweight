@@ -68,3 +68,6 @@ A ggplot2 object, containing the bias contour plot
 \description{
 Generates bias contour plots to aid with sensitivity analysis
 }
+\examples{
+# TODO
+}

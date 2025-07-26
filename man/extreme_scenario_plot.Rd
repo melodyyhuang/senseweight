@@ -29,3 +29,6 @@ A ggplot2 object, genearting an extreme scenario analysis
 \description{
 Generates extreme scenario plots, with varying thresholds for the correlation between the true weights and the outcomes
 }
+\examples{
+# TODO
+}

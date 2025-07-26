@@ -1,12 +1,17 @@
 #' Robustness Value
 #'
 #' Returns the estimated robustness value, for a specified proportion change
+#' 
 #' @param b_star Threshold that corresponds to a substantively meaningful change to the research conclusion. For example, a value of 0 denotes that the bias from omitting a variable was sufficiently large to change the estimate to zero.
 #' @param estimate Weighted estimate
 #' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)
 #' @param weights Vector of estimated weights
+#' 
 #' @return Robustness value for a specified proportion change
 #' @export
+#' 
+#' @examples
+#' # TODO
 robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
   a <- (estimate - b_star)^2 / (sigma2 * stats::var(weights))
   RV_est <- (sqrt(a^2 + 4 * a) - a) / 2
@@ -18,6 +23,7 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 #' Formal benchmarking for sensitivity parameters
 #'
 #' Returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
+#' 
 #' @param weights Vector of estimated weights
 #' @param weights_benchmark Vector of estimated weights, omitting the covariate (or set of covariates) being used to benchmark
 #' @param k_sigma Relative ability of omitted confounder to explain variation in the true weights. If \code{k_sigma > 1}, then we expect the omitted confounder to explain more variation in the true weights than the benchmarked covariate(s). If \code{k_sigma < 1}, then we expect the omitted confounder to explain less of the variation in the true weights than the benchmarked covariate(s). Default is set to 1.
@@ -26,8 +32,12 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 #' @param Z Vector of treatment assignment (Only necessary if \code{estimand = "PATE"} in order to estimate covariances)
 #' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)
 #' @param estimand String specifying the estimand of interest. Valid inputs are "PATE", "Augmented", "ATT", or "Survey".
+#' 
 #' @return \code{data.frame} containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder.
 #' @export
+#' 
+#' @examples
+#' # TODO
 benchmark_parameters <- function(weights, weights_benchmark, k_sigma = 1, k_rho = 1,
                                  Y, Z, sigma2, estimand = "ATT") {
   # Estimate informal calibrated components
@@ -64,6 +74,7 @@ benchmark_parameters <- function(weights, weights_benchmark, k_sigma = 1, k_rho 
 #' Bias Contour Plots
 #'
 #' Generates bias contour plots to aid with sensitivity analysis
+#' 
 #' @param varW Variance of the estimated weights
 #' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'
 #' @param killer_confounder Threshold for bias considered large enough to be a killer confounder. For example, if researchers are concerned about the bias large enough to reduce an estimated treatment effect to zero or change directional sign, set \code{killer_confounder} equal to the point estimate.
@@ -82,8 +93,12 @@ benchmark_parameters <- function(weights, weights_benchmark, k_sigma = 1, k_rho 
 #' @param axis_title_size Size of the axis title. Default is set to \code{14}.
 #' @param axis_line_width Width of the axis lines. Default is set to \code{1}.
 #' @param print If set to \code{TRUE}, the function will return a list with two elements: \code{plot} which contains the generated bias contour plot, and \code{data}, which provides the data.frame for generating the contour plot. If set to \code{FALSE}, the function will simply generate the bias contour plot. Default is set to \code{FALSE}.
+#' 
 #' @return A ggplot2 object, containing the bias contour plot
 #' @export
+#' 
+#' @examples
+#' # TODO
 contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
                          benchmark = TRUE, shade = FALSE, shade_var = NULL,
                          shade_fill = "#35a4bf", shade_alpha = 0.25,
@@ -206,13 +221,18 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
 #' Extreme Scenario Plots
 #'
 #' Generates extreme scenario plots, with varying thresholds for the correlation between the true weights and the outcomes
+#' 
 #' @param rho_w Correlation between the estimated weights and the outcomes
 #' @param weights Vector of estimated weights
 #' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'
 #' @param estimate Weighted estimate
 #' @param correlations A vector containing possible correlation values between the true weights and the outcomes
+#' 
 #' @return A ggplot2 object, genearting an extreme scenario analysis
 #' @export
+#' 
+#' @examples
+#' # TODO
 extreme_scenario_plot <- function(rho_w, weights, sigma2, estimate, correlations = c(0.25, 0.5, 0.9, 1)) {
   df_plot <- calculate_extreme_scenario(rho_w, weights, sigma2, correlations)
   p1 <- df_plot[which(estimate - df_plot$bias >= 0), ] |>

@@ -21,3 +21,6 @@ Robustness value for a specified proportion change
 \description{
 Returns the estimated robustness value, for a specified proportion change
 }
+\examples{
+# TODO
+}

@@ -35,3 +35,6 @@ Robustness value for a specified proportion change
 \description{
 Returns the benchmarking results for a single covariate (or a single group of covariates)
 }
+\examples{
+# TODO
+}

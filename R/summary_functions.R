@@ -1,6 +1,7 @@
 #' Benchmark an instance
 #'
 #' Returns the benchmarking results for a single covariate (or a single group of covariates)
+#' 
 #' @param omit Variable to omit
 #' @param weights Vector of estimated weights
 #' @param data data.frame containing outcomes and covariate infromation
@@ -8,8 +9,12 @@
 #' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
 #' @param weight_max Maximum weight to trim at. Default set to \code{Inf}
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
+#' 
 #' @return Robustness value for a specified proportion change
 #' @export
+#' 
+#' @examples
+#' # TODO
 benchmark <- function(omit, weights, data, sigma2,
                       weighting_method = "ebal",
                       weight_max = Inf, estimand = "ATT") {
@@ -40,6 +45,7 @@ benchmark <- function(omit, weights, data, sigma2,
 #' Run Formal Benchmarking
 #'
 #' Wrapper function to run formal benchmarking on a set of pre-specified covariates. Returns a data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder.
+#' 
 #' @param weighting_vars Vector of variables to use in the weights estimation
 #' @param benchmark_vars Vector of variables to benchmark parameters for. If \code{benchmark_vars = 'all'}, benchmarking will be run across all variables included in the weights. If not set to \code{all}, benchmarking will be conducted across the covariates included in the vector.
 #' @param data A data.frame containing the observed covariates included in the weights; must include variables specified in weighting_vars
@@ -52,8 +58,12 @@ benchmark <- function(omit, weights, data, sigma2,
 #' @param RV Robustness Value
 #' @param sigma2 If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
+#' 
 #' @return data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder for the set of pre-specified covariates.
 #' @export
+#' 
+#' @examples
+#' # TODO
 run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
                              data, treatment, outcome, selection,
                              weighting_method = "ebal", weight_max = Inf,
@@ -100,6 +110,7 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 #' Sensitivity Summary
 #'
 #' Returns a data.frame or Kable table with summary measures of sensitivity
+#' 
 #' @param weights Vector of estimated weights
 #' @param Y Outcome of interest
 #' @param Z Treatment assignment
@@ -115,8 +126,12 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 #' @param outcome_function TODO (document me!)
 #' @param svy_srs TODO (document me!)
 #' @param svy_wt TODO (document me!)
+#' 
 #' @return Sensitivity summary
 #' @export
+#' 
+#' @examples
+#' # TODO
 summarize_sensitivity <- function(weights, Y, Z, b_star = 0,
                                   estimate = NULL, SE = NULL, unweighted = NULL,
                                   sigma2 = NULL, estimand = "ATT", pretty = FALSE,

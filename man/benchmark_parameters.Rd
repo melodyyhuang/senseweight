@@ -38,3 +38,6 @@ benchmark_parameters(
 \description{
 Returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
 }
+\examples{
+# TODO
+}

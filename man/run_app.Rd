@@ -15,3 +15,8 @@ A shiny application
 \description{
 Run Shiny SenseWeight application
 }
+\examples{
+if (interactive()) {
+ run_app()
+}
+}

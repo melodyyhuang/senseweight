@@ -19,3 +19,6 @@ Correlation between the error and the weights, based on a user-input \code{R2} v
 \description{
 Returns the correlation between the error and the weights, using a user-inputted \code{R2} value, the correlation between the estimated weights and outcomes, and a scaling factor
 }
+\examples{
+# TODO
+}

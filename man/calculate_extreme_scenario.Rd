@@ -26,3 +26,6 @@ A data frame that can be used to generate the extreme scenario plots
 \description{
 Helper function for running an extreme scenario analysis
 }
+\examples{
+# TODO
+}

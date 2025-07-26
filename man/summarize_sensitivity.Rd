@@ -59,3 +59,6 @@ Sensitivity summary
 \description{
 Returns a data.frame or Kable table with summary measures of sensitivity
 }
+\examples{
+# TODO
+}
