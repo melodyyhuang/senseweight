@@ -97,3 +97,17 @@ calculate_extreme_scenario <- function(rho_w, weights, sigma2, correlations = c(
 
   return(df_plot)
 }
+
+
+#' Function for creating targets from auxiliary information and formula
+#' @keywords internal
+create_targets <- function(target_design, target_formula) {
+  target_mf <- stats::model.frame(target_formula, stats::model.frame(target_design))
+  target_mm <- stats::model.matrix(target_formula, target_mf)
+  wts <- stats::weights(target_design)
+  if (all(wts == 1)) {
+    return(colMeans(target_mm))
+  } else {
+    return(colSums(target_mm * wts) / sum(wts))
+  }
+}

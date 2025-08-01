@@ -16,27 +16,14 @@ Depends:
     R (>= 4.1.0)
 LazyData: true
 Imports: 
-    bslib,
     dplyr,
     estimatr,
     ggplot2,
     ggrepel,
-    htmltools,
     kableExtra,
     metR,
-    purrr,
     rlang,
-    shiny,
-    shinydashboard,
-    shinydashboardPlus,
-    shinyjs,
-    shinyWidgets,
-    shinyWrappers (>= 0.0.0.9000),
     survey,
-    vthemes (>= 0.1.0),
     WeightIt
 Suggests: 
     pkgload
-Remotes: 
-    tiffanymtang/shinyWrappers,
-    Yu-Group/vthemes

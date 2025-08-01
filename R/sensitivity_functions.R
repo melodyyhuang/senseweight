@@ -200,12 +200,13 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
   
   plt <- plt +
     ggplot2::guides(color = "none") +
-    vthemes::theme_vmodern(
-      bg_color = "white",
-      grid_color = "white",
-      axis_text_size = axis_text_size,
-      axis_title_size = axis_title_size,
-      axis_line_width = axis_line_width
+    ggplot2::theme(
+      panel.background = ggplot2::element_rect(fill = "white"),
+      panel.grid.major = ggplot2::element_line(color = "white"),
+      panel.grid.minor = ggplot2::element_blank(),
+      axis.text = ggplot2::element_text(size = axis_text_size),
+      axis.title = ggplot2::element_text(size = axis_title_size, face = "bold"),
+      axis.line = ggplot2::element_line(linewidth = axis_line_width, color = "black")
     ) +
     ggplot2::coord_flip() +
     ggplot2::scale_x_continuous(expand = c(0.01, 0.01)) +
