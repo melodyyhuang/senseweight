@@ -11,7 +11,34 @@
 #' @export
 #' 
 #' @examples
-#' # TODO
+#' data(jtpa_women)
+#' site_name <- "NE"
+#' df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+#' df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+#' 
+#' # Estimate unweighted estimator:
+#' model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+#' PATE <- coef(lm(Y ~ T, data = df_else))[2]
+#' DiM <- coef(model_dim)[2]
+# 
+#' # Generate weights using observed covariates:
+#' df_all <- jtpa_women
+#' df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+#' model_ps <- WeightIt::weightit(
+#'   (1 - S) ~ . - site - T - Y, 
+#'   data = df_all, method = "ebal", estimand = "ATT"
+#' )
+#' weights <- model_ps$weights[df_all$S == 1]
+# 
+#' # Estimate IPW model:
+#' model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+#' ipw <- coef(model_ipw)[2]
+# 
+#' # Estimate bound for var(tau):
+#' vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
+#' RV <- robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = weights)
+#' 
+#' print(RV)
 robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
   a <- (estimate - b_star)^2 / (sigma2 * stats::var(weights))
   RV_est <- (sqrt(a^2 + 4 * a) - a) / 2
@@ -22,7 +49,7 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 
 #' Formal benchmarking for sensitivity parameters
 #'
-#' Returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
+#' Helper function that returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
 #' 
 #' @param weights Vector of estimated weights
 #' @param weights_benchmark Vector of estimated weights, omitting the covariate (or set of covariates) being used to benchmark
@@ -37,7 +64,48 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 #' @export
 #' 
 #' @examples
-#' # TODO
+#' data(jtpa_women)
+#' site_name <- "NE"
+#' df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+#' df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+#' 
+#' # Estimate unweighted estimator:
+#' model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+#' PATE <- coef(lm(Y ~ T, data = df_else))[2]
+#' DiM <- coef(model_dim)[2]
+# 
+#' # Generate weights using observed covariates:
+#' df_all <- jtpa_women
+#' df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+#' model_ps <- WeightIt::weightit(
+#'   (1 - S) ~ . - site - T - Y, 
+#'   data = df_all, method = "ebal", estimand = "ATT"
+#' )
+#' weights <- model_ps$weights[df_all$S == 1]
+# 
+#' # Estimate IPW model:
+#' model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+#' ipw <- coef(model_ipw)[2]
+# 
+#' # Estimate bound for var(tau):
+#' vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
+#' RV <- robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = weights)
+#' 
+#' # Select weighting variables:
+#' weighting_vars <- names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
+#' 
+#' # Run bechmarking:
+#' df_benchmark <- run_benchmarking(
+#'   weighting_vars,
+#'   data = df_all[, -1],
+#'   treatment = "T", outcome = "Y", selection = "S",
+#'   estimate = ipw,
+#'   RV = RV, sigma2 = vartau,
+#'   estimand = "PATE"
+#' )
+#' 
+#' print(df_benchmark)
+#' 
 benchmark_parameters <- function(weights, weights_benchmark, k_sigma = 1, k_rho = 1,
                                  Y, Z, sigma2, estimand = "ATT") {
   # Estimate informal calibrated components

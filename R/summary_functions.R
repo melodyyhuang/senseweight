@@ -10,7 +10,7 @@
 #' @param weight_max Maximum weight to trim at. Default set to \code{Inf}
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' 
-#' @return Robustness value for a specified proportion change
+#' @return Benchmarking results for a single covariate
 #' @export
 #' 
 #' @examples
@@ -63,7 +63,48 @@ benchmark <- function(omit, weights, data, sigma2,
 #' @export
 #' 
 #' @examples
-#' # TODO
+#' data(jtpa_women)
+#' site_name <- "NE"
+#' df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+#' df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+#' 
+#' # Estimate unweighted estimator:
+#' model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+#' PATE <- coef(lm(Y ~ T, data = df_else))[2]
+#' DiM <- coef(model_dim)[2]
+# 
+#' # Generate weights using observed covariates:
+#' df_all <- jtpa_women
+#' df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+#' model_ps <- WeightIt::weightit(
+#'   (1 - S) ~ . - site - T - Y, 
+#'   data = df_all, method = "ebal", estimand = "ATT"
+#' )
+#' weights <- model_ps$weights[df_all$S == 1]
+# 
+#' # Estimate IPW model:
+#' model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+#' ipw <- coef(model_ipw)[2]
+# 
+#' # Estimate bound for var(tau):
+#' vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
+#' RV <- robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = weights)
+#' 
+#' # Select weighting variables:
+#' weighting_vars <- names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
+#' 
+#' # Run bechmarking:
+#' df_benchmark <- run_benchmarking(
+#'   weighting_vars,
+#'   data = df_all[, -1],
+#'   treatment = "T", outcome = "Y", selection = "S",
+#'   estimate = ipw,
+#'   RV = RV, sigma2 = vartau,
+#'   estimand = "PATE"
+#' )
+#' 
+#' print(df_benchmark)
+#' 
 run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
                              data, treatment, outcome, selection,
                              weighting_method = "ebal", weight_max = Inf,
@@ -121,21 +162,44 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 #' @param sigma2 (Optional) Variance of outcomes or individual-level treatment effect in PATE case. In the case of a PATE estimator, if not specified, function will automatically estimate an upper bound for the variance of the individual-level treatment effect.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
-#' @param dependent_var TODO (document me!)
 #' @param model TODO (document me!)
-#' @param outcome_function TODO (document me!)
-#' @param svy_srs TODO (document me!)
-#' @param svy_wt TODO (document me!)
+#' @param svy_srs Unweighted survey object
+#' @param svy_wt Weighted survey object
 #' 
 #' @return Sensitivity summary
 #' @export
 #' 
 #' @examples
-#' # TODO
+#' data(jtpa_women)
+#' site_name <- "NE"
+#' df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+#' df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+#' 
+#' # Estimate unweighted estimator:
+#' model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+#' PATE <- coef(lm(Y ~ T, data = df_else))[2]
+#' DiM <- coef(model_dim)[2]
+# 
+#' # Generate weights using observed covariates:
+#' df_all <- jtpa_women
+#' df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+#' model_ps <- WeightIt::weightit(
+#'   (1 - S) ~ . - site - T - Y, 
+#'   data = df_all, method = "ebal", estimand = "ATT"
+#' )
+#' weights <- model_ps$weights[df_all$S == 1]
+# 
+#' # Estimate IPW model:
+#' model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+#' ipw <- coef(model_ipw)[2]
+# 
+#' # Estimate bound for var(tau):
+#' vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
+#' summarize_sensitivity(weights = weights, Y = df_site$Y, Z = df_site$T, sigma2 = vartau, estimand = "PATE")
 summarize_sensitivity <- function(weights, Y, Z, b_star = 0,
                                   estimate = NULL, SE = NULL, unweighted = NULL,
                                   sigma2 = NULL, estimand = "ATT", pretty = FALSE,
-                                  dependent_var = NULL, model = NULL, outcome_function = NULL,
+                                  model = NULL,
                                   svy_srs = NULL, svy_wt = NULL) {
   if (estimand == "Survey") {
     if (!is.null(model)) {

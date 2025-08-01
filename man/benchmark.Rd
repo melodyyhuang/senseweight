@@ -30,7 +30,7 @@ benchmark(
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
 }
 \value{
-Robustness value for a specified proportion change
+Benchmarking results for a single covariate
 }
 \description{
 Returns the benchmarking results for a single covariate (or a single group of covariates)

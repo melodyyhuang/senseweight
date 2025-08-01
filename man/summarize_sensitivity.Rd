@@ -60,5 +60,27 @@ Sensitivity summary
 Returns a data.frame or Kable table with summary measures of sensitivity
 }
 \examples{
-# TODO
+data(jtpa_women)
+site_name <- "NE"
+df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+
+# Estimate unweighted estimator:
+model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+PATE <- coef(lm(Y ~ T, data = df_else))[2]
+DiM <- coef(model_dim)[2]
+# Generate weights using observed covariates:
+df_all <- jtpa_women
+df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+model_ps <- WeightIt::weightit(
+  (1 - S) ~ . - site - T - Y, 
+  data = df_all, method = "ebal", estimand = "ATT"
+)
+weights <- model_ps$weights[df_all$S == 1]
+# Estimate IPW model:
+model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+ipw <- coef(model_ipw)[2]
+# Estimate bound for var(tau):
+vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
+summarize_sensitivity(weights = weights, Y = df_site$Y, Z = df_site$T, sigma2 = vartau, estimand = "PATE")
 }

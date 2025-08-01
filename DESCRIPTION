@@ -26,4 +26,10 @@ Imports:
     survey,
     WeightIt
 Suggests: 
-    pkgload
+    knitr,
+    pkgload,
+    rmarkdown
+Remotes: 
+    tiffanymtang/shinyWrappers,
+    Yu-Group/vthemes
+VignetteBuilder: knitr
