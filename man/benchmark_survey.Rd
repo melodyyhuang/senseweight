@@ -11,7 +11,7 @@ benchmark_survey(
   pop_svy,
   sample_svy,
   Y,
-  weighting_method
+  weighting_method = "raking"
 )
 }
 \arguments{
@@ -36,5 +36,42 @@ Benchmarking results for a variable (or subset of variables)
 Returns benchmarking results for survey weighting
 }
 \examples{
-# TODO
+
+data(ces)
+data(wapo)
+wapo_srs <- survey::svydesign(ids = ~ 1, data = wapo)
+ces_awt <- survey::svydesign(ids = ~ 1,
+                     weights = ~ vvweight_post,
+                     data = ces)
+
+#Set up raking formula:
+formula_rake <- ~ age_buckets + educ + gender + race + educ * pid + bornagain
+
+#Generate targets:
+targets_rake <- create_targets(ces_awt, formula_rake)
+
+#PERFORM RAKING:
+model_rake <- survey::calibrate(
+  design = wapo_srs,
+  formula = formula_rake,
+  population = targets_rake,
+  calfun = "raking",
+  force = TRUE
+)
+
+rake_results <- survey::svydesign( ~ 1, data = wapo, weights = stats::weights(model_rake))
+#Estimate from raking results:
+weights = stats::weights(rake_results) * nrow(model_rake)
+#Normalize to mean 1:
+weights = weights / mean(weights)
+
+unweighted_estimate = survey::svymean(~ candidate, wapo_srs, na.rm = TRUE)
+weighted_estimate = survey::svymean(~ candidate, model_rake, na.rm = TRUE)
+benchmark_survey('educ', 
+ formula = formula_rake,
+ weights = weights,
+ pop_svy = ces_awt,
+ sample_svy = wapo_srs,
+ Y = wapo$candidate,
+ )
 }

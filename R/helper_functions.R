@@ -11,8 +11,11 @@
 #' @export
 #' 
 #' @examples
-#' # TODO
-#' 
+#' set.seed(331)
+#' Y = rnorm(1000)
+#' weights = rlogis(1000)
+#' weights = weights/mean(weights)
+#' estimate_bias(rho = 0.5, R2 = 0.5, weights = weights, sigma2 = var(Y))
 estimate_bias <- function(rho, R2, weights, sigma2) {
   if (R2 >= 1 || R2 < 0) {
     return("R2 must be bound on interval [0,1)")
@@ -21,86 +24,28 @@ estimate_bias <- function(rho, R2, weights, sigma2) {
   return(rho * sqrt(var_eps * sigma2))
 }
 
-#' Generate Correlation
-#'
-#' Returns the correlation between the error and the weights, using a user-inputted \code{R2} value, the correlation between the estimated weights and outcomes, and a scaling factor
+#' Helper function for creating targets from auxiliary information and formula
 #' 
-#' @param rho_w Estimated correlation between the estimated weights and the outcomes
-#' @param k Scaling factor, denoting how many times larger the correlation between the true weights and the outcomes are, relative to the correlation between the estimated weights and the outcomes
-#' @param R2 R^2 measure for how much variation in the true weights is explained by the error term, must be bound on the range \code{[0,1)}
+#' Returns weighting targets for survey objects. 
 #' 
-#' @return Correlation between the error and the weights, based on a user-input \code{R2} value and \code{stats::cor(w,Y)}
+#' @param target_design A survey object 
+#' @param target_formula A formula object that contains the variables to weight on
+#' 
+#' @return Weighting target for survey objects
 #' @export
 #' 
 #' @examples
-#' # TODO
-generate_rho <- function(rho_w, k, R2) {
-  if (R2 >= 1 || R2 < 0) {
-    return("R2 must be bound on interval [0,1)")
-  }
-  return(rho_w * sqrt((1 - R2) / R2) - (rho_w * k) / sqrt(R2))
-}
-
-#' Calculate extreme scenario
-#'
-#' Helper function for running an extreme scenario analysis
+#' data(ces)
+#' ces_awt = survey::svydesign(ids = ~ 1,
+#'                      weights = ~ vvweight_post,
+#'                      data = ces)
 #' 
-#' @param rho_w Estimated correlation between the estimated weights and the outcomes+
-#' @param weights Vector of estimated weights
-#' @param sigma2 Variance of the outcomes
-#' @param correlations A vector containing possible correlation values between the true weights and the outcomes
+#' #Set up raking formula:
+#' formula_rake = ~ age_buckets + educ + gender + race + educ * pid + bornagain
 #' 
-#' @return A data frame that can be used to generate the extreme scenario plots
-#' @export
+#' #Generate targets:
+#' targets_rake = create_targets(ces_awt, formula_rake)
 #' 
-#' @examples
-#' # TODO
-calculate_extreme_scenario <- function(rho_w, weights, sigma2, correlations = c(0.25, 0.5, 0.9, 1)) {
-  R2_vals <- seq(0.01, 0.99, by = 0.01)
-  cor_values <- list(NULL)
-  i <- 1
-  for (rho in c(-correlations, correlations)) {
-    cor_values[[i]] <- sapply(R2_vals, generate_rho, rho_w = rho_w, k = rho / rho_w)
-    i <- i + 1
-  }
-  values <- c(-correlations, correlations)
-  names(cor_values) <- paste(values)
-  df_plot <- lapply(
-    1:length(cor_values),
-    function(x) {
-      data.frame(
-        type = values[x], R2_vals,
-        bias = estimate_bias(unlist(cor_values[x]), R2_vals, weights, sigma2),
-        rho = unlist(cor_values[x])
-      )
-    }
-  ) |> dplyr::bind_rows()
-
-  df_plot <- df_plot[which(abs(df_plot$rho) < sqrt(1 - rho_w^2)), ]
-
-  find_max <- df_plot |>
-    dplyr::group_by(.data$type) |>
-    dplyr::summarize(
-      val = max(.data$R2_vals)
-    )
-
-  df_plot$label <- NA
-  for (i in 1:nrow(find_max)) {
-    df_plot$label[df_plot$type == find_max$type[i] & df_plot$R2 == find_max$val[i]] <-
-      paste(find_max$type[i])
-  }
-  df_plot$type_abs <- paste(abs(as.numeric(paste(df_plot$type))))
-  df_plot$type_abs <- as.factor(df_plot$type_abs)
-  df_plot$type_abs <- factor(df_plot$type_abs, levels = rev(levels(df_plot$type_abs)))
-  
-  levels(df_plot$type_abs) <- paste(abs(df_plot$type)[order(-abs(df_plot$type))])
-
-  return(df_plot)
-}
-
-
-#' Function for creating targets from auxiliary information and formula
-#' @keywords internal
 create_targets <- function(target_design, target_formula) {
   target_mf <- stats::model.frame(target_formula, stats::model.frame(target_design))
   target_mm <- stats::model.matrix(target_formula, target_mf)
@@ -110,4 +55,46 @@ create_targets <- function(target_design, target_formula) {
   } else {
     return(colSums(target_mm * wts) / sum(wts))
   }
+}
+
+#' Helper function to benchmark an instance
+#'
+#' Returns the benchmarking results for a single covariate (or a single group of covariates)
+#' 
+#' @param omit Variable to omit
+#' @param weights Vector of estimated weights
+#' @param data data.frame containing outcomes and covariate information
+#' @param sigma2 Variance of the outcome variable 
+#' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
+#' @param weight_max Maximum weight to trim at. Default set to \code{Inf}
+#' @param estimand Specifies estimand; possible parameters include "ATT" or "PATE",
+#' 
+#' @return Benchmarking results for a single covariate
+#' @keywords internal
+benchmark <- function(omit, weights, data, sigma2,
+                      estimand = "ATT",
+                      weighting_method = "ebal",
+                      weight_max = Inf) {
+  data_benchmark <- data |> dplyr::select(-omit)
+  model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
+                                      data = data_benchmark,
+                                      method = weighting_method, estimand = "ATT"
+  )
+  weights_benchmark <- model_weights$weights
+  weights_benchmark <- stats::weights(
+    survey::trimWeights(survey::svydesign(~1, data = data_benchmark, weights = weights_benchmark),
+                        upper = weight_max
+    )
+  )
+  return(data.frame(
+    variable = omit,
+    senseweight:::benchmark_parameters(weights[data$missing == 0] / mean(weights[data$missing == 0]),
+                         weights_benchmark[data$missing == 0] / mean(weights_benchmark[data$missing == 0]),
+                         data$outcome[data$missing == 0],
+                         data$treatment[data$missing == 0],
+                         sigma2,
+                         k_sigma = 1, k_rho = 1,
+                         estimand = estimand
+    )
+  ))
 }

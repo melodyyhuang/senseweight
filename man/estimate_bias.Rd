@@ -22,6 +22,9 @@ Estimated bias from omitting a confounder from weights
 Returns the bias based on the different parameters in the bias decomposition
 }
 \examples{
-# TODO
-
+set.seed(331)
+Y = rnorm(1000)
+weights = rlogis(1000)
+weights = weights/mean(weights)
+estimate_bias(rho = 0.5, R2 = 0.5, weights = weights, sigma2 = var(Y))
 }

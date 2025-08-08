@@ -1,0 +1,112 @@
+---
+title: "Conducting sensitivity analysis for survey weights"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{election}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message = FALSE, warning=FALSE}
+library(senseweight)
+library(survey)
+```
+
+We begin by setting up the survey design objects. We will examine a Washington Post poll for Michigan conducted in 2020. We will use the `ces` dataset (which corresponds to the subset of CES for the state of Michigan) to generate targets for raking. When `candidate = 1`, this implies that the individual indicated they would vote for Biden, whereas 0 implies either voting for Trump or another candidate.
+
+```{r}
+data(ces)
+data(wapo)
+```
+
+# Setting up survey objects 
+
+The `senseweight` package builds on top of the `survey` package to conduct sensitivity analysis. To start, we will set up different survey objects for our analysis. 
+
+```{r, warning=FALSE, message=FALSE}
+wapo_srs <- svydesign(ids = ~ 1, data = wapo)
+ces_awt <- svydesign(ids = ~ 1,
+                     weights = ~ vvweight_post,
+                     data = ces)
+
+#Set up raking formula:
+formula_rake <- ~ age_buckets + educ + gender + race + educ + pid + bornagain
+
+targets_rake <- create_targets(ces_awt, formula_rake)
+
+#PERFORM RAKING:
+model_rake <- calibrate(
+  design = wapo_srs,
+  formula = formula_rake,
+  population = targets_rake,
+  calfun = "raking",
+  force = TRUE
+)
+
+
+rake_results <- svydesign( ~ 1, data = wapo, weights = stats::weights(model_rake))
+#Estimate from raking results:
+weights = stats::weights(rake_results) * nrow(model_rake)
+
+unweighted_estimate = svymean(~ candidate, wapo_srs, na.rm = TRUE)
+weighted_estimate = svymean(~ candidate, model_rake, na.rm = TRUE)
+
+```
+
+# Summarizing sensitivity 
+
+With the survey objects, we can now generate our sensitivity summaries. The following function will produce a table that outputs the unweighted estimate, the weighted estimate, and the robustness value corresponding to a threshold bias value. The threshold bias value corresponds to the amount of bias that would result in a change in the substantive takeaway from a result. 
+
+```{r}
+summarize_sensitivity(estimand = 'Survey',
+                      Y = wapo$candidate,
+                      weights = weights,
+                      svy_srs = unweighted_estimate, 
+                      svy_wt = weighted_estimate,
+                      b_star = 0.53)
+
+```
+
+
+```{r}
+benchmark_survey('educ', 
+                 formula = formula_rake,
+                 weights = weights,
+                 pop_svy = ces_awt,
+                 sample_svy = wapo_srs,
+                 Y = wapo$candidate)
+```
+
+```{r}
+covariates = c("age_buckets", "educ", "gender", "race",
+               "educ", "pid", "bornagain")
+
+benchmark_results = run_benchmarking(estimate = 0.499,
+                 RV = 0.08,
+                 formula = formula_rake,
+                 weights = weights,
+                 pop_svy = ces_awt,
+                 Y = wapo$candidate,
+                 sample_svy = wapo_srs,
+                 estimand= "Survey")
+print(benchmark_results)
+
+```
+
+# Bias contour plot
+
+```{r}
+contour_plot(varW = var(weights), 
+             sigma2 = var(wapo$candidate),
+             killer_confounder = 0.53, 
+             df_benchmark = benchmark_results,
+             shade = TRUE, 
+             label_size = 3)
+```

@@ -5,22 +5,41 @@
 \title{Run Formal Benchmarking}
 \usage{
 run_benchmarking(
-  weighting_vars,
-  benchmark_vars = "all",
-  data,
-  treatment,
-  outcome,
-  selection,
-  weighting_method = "ebal",
-  weight_max = Inf,
   estimate,
   RV,
-  sigma2,
+  formula = NULL,
+  weights = NULL,
+  pop_svy = NULL,
+  sample_svy = NULL,
+  Y = NULL,
+  weighting_vars = NULL,
+  benchmark_vars = "all",
+  data = NULL,
+  treatment = NULL,
+  outcome = NULL,
+  selection = NULL,
+  weighting_method = "ebal",
+  weight_max = Inf,
+  sigma2 = NULL,
   estimand = "ATT"
 )
 }
 \arguments{
-\item{weighting_vars}{Vector of variables to use in the weights estimation}
+\item{estimate}{Weighted estimate}
+
+\item{RV}{Robustness Value}
+
+\item{formula}{Raking formula for survey estimand}
+
+\item{weights}{A vector, containing the estimated survey weights}
+
+\item{pop_svy}{Survey object, containing the population the survey sample is being re-weighted to}
+
+\item{sample_svy}{Survey object, containing the survey sample being re-weighted}
+
+\item{Y}{outcome of interest (used for survey object)}
+
+\item{weighting_vars}{Vector of variables to use in the weights estimation for ATT or PATE}
 
 \item{benchmark_vars}{Vector of variables to benchmark parameters for. If \code{benchmark_vars = 'all'}, benchmarking will be run across all variables included in the weights. If not set to \code{all}, benchmarking will be conducted across the covariates included in the vector.}
 
@@ -36,10 +55,6 @@ run_benchmarking(
 
 \item{weight_max}{Maximum weight to trim at. Default set to \code{Inf}.}
 
-\item{estimate}{Weighted estimate}
-
-\item{RV}{Robustness Value}
-
 \item{sigma2}{If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.}
 
 \item{estimand}{Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"}
@@ -51,6 +66,7 @@ data.frame containing the benchmarked parameter values, the estimated bias, MRCS
 Wrapper function to run formal benchmarking on a set of pre-specified covariates. Returns a data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder.
 }
 \examples{
+# For the external validity setting: 
 data(jtpa_women)
 site_name <- "NE"
 df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
@@ -78,9 +94,9 @@ RV <- robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = we
 # Select weighting variables:
 weighting_vars <- names(df_all)[which(!names(df_all) \%in\% c("site", "S", "Y", "T"))]
 
-# Run bechmarking:
+# Run benchmarking:
 df_benchmark <- run_benchmarking(
-  weighting_vars,
+  weighting_vars = weighting_vars,
   data = df_all[, -1],
   treatment = "T", outcome = "Y", selection = "S",
   estimate = ipw,

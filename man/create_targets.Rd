@@ -2,11 +2,31 @@
 % Please edit documentation in R/helper_functions.R
 \name{create_targets}
 \alias{create_targets}
-\title{Function for creating targets from auxiliary information and formula}
+\title{Helper function for creating targets from auxiliary information and formula}
 \usage{
 create_targets(target_design, target_formula)
 }
-\description{
-Function for creating targets from auxiliary information and formula
+\arguments{
+\item{target_design}{A survey object}
+
+\item{target_formula}{A formula object that contains the variables to weight on}
 }
-\keyword{internal}
+\value{
+Weighting target for survey objects
+}
+\description{
+Returns weighting targets for survey objects.
+}
+\examples{
+data(ces)
+ces_awt = survey::svydesign(ids = ~ 1,
+                     weights = ~ vvweight_post,
+                     data = ces)
+
+#Set up raking formula:
+formula_rake = ~ age_buckets + educ + gender + race + educ * pid + bornagain
+
+#Generate targets:
+targets_rake = create_targets(ces_awt, formula_rake)
+
+}

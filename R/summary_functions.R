@@ -1,61 +1,22 @@
-#' Benchmark an instance
-#'
-#' Returns the benchmarking results for a single covariate (or a single group of covariates)
-#' 
-#' @param omit Variable to omit
-#' @param weights Vector of estimated weights
-#' @param data data.frame containing outcomes and covariate infromation
-#' @param sigma2 TODO document me!
-#' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
-#' @param weight_max Maximum weight to trim at. Default set to \code{Inf}
-#' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
-#' 
-#' @return Benchmarking results for a single covariate
-#' @export
-#' 
-#' @examples
-#' # TODO
-benchmark <- function(omit, weights, data, sigma2,
-                      weighting_method = "ebal",
-                      weight_max = Inf, estimand = "ATT") {
-  data_benchmark <- data |> dplyr::select(-omit)
-  model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
-    data = data_benchmark,
-    method = weighting_method, estimand = "ATT"
-  )
-  weights_benchmark <- model_weights$weights
-  weights_benchmark <- stats::weights(
-    survey::trimWeights(survey::svydesign(~1, data = data_benchmark, weights = weights_benchmark),
-      upper = weight_max
-    )
-  )
-  return(data.frame(
-    variable = omit,
-    benchmark_parameters(weights[data$missing == 0] / mean(weights[data$missing == 0]),
-      weights_benchmark[data$missing == 0] / mean(weights_benchmark[data$missing == 0]),
-      data$outcome[data$missing == 0],
-      data$treatment[data$missing == 0],
-      sigma2,
-      k_sigma = 1, k_rho = 1,
-      estimand = estimand
-    )
-  ))
-}
-
-#' Run Formal Benchmarking
+#' Run Formal Benchmarking 
 #'
 #' Wrapper function to run formal benchmarking on a set of pre-specified covariates. Returns a data.frame containing the benchmarked parameter values, the estimated bias, MRCS, and minimum \code{k_sigma} and \code{k_rho} values for a killer confounder.
 #' 
-#' @param weighting_vars Vector of variables to use in the weights estimation
+#' @param estimate Weighted estimate
+#' @param RV Robustness Value
+#' @param weighting_vars Vector of variables to use in the weights estimation for ATT or PATE
 #' @param benchmark_vars Vector of variables to benchmark parameters for. If \code{benchmark_vars = 'all'}, benchmarking will be run across all variables included in the weights. If not set to \code{all}, benchmarking will be conducted across the covariates included in the vector.
 #' @param data A data.frame containing the observed covariates included in the weights; must include variables specified in weighting_vars
 #' @param treatment Denotes which variable is the treatment variable
 #' @param outcome Denotes which variable is the outcome variable
 #' @param selection Denotes which variable is the selection variable
+#' @param formula Raking formula for survey estimand 
+#' @param weights A vector, containing the estimated survey weights
+#' @param sample_svy Survey object, containing the survey sample being re-weighted
+#' @param pop_svy Survey object, containing the population the survey sample is being re-weighted to
+#' @param Y outcome of interest (used for survey object)
 #' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
 #' @param weight_max Maximum weight to trim at. Default set to \code{Inf}.
-#' @param estimate Weighted estimate
-#' @param RV Robustness Value
 #' @param sigma2 If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' 
@@ -63,6 +24,7 @@ benchmark <- function(omit, weights, data, sigma2,
 #' @export
 #' 
 #' @examples
+#' # For the external validity setting: 
 #' data(jtpa_women)
 #' site_name <- "NE"
 #' df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
@@ -93,9 +55,9 @@ benchmark <- function(omit, weights, data, sigma2,
 #' # Select weighting variables:
 #' weighting_vars <- names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
 #' 
-#' # Run bechmarking:
+#' # Run benchmarking:
 #' df_benchmark <- run_benchmarking(
-#'   weighting_vars,
+#'   weighting_vars = weighting_vars,
 #'   data = df_all[, -1],
 #'   treatment = "T", outcome = "Y", selection = "S",
 #'   estimate = ipw,
@@ -105,41 +67,64 @@ benchmark <- function(omit, weights, data, sigma2,
 #' 
 #' print(df_benchmark)
 #' 
-run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
-                             data, treatment, outcome, selection,
+
+run_benchmarking <- function(estimate, RV, 
+                             formula = NULL, weights = NULL, pop_svy = NULL,
+                             sample_svy = NULL, Y = NULL,
+                             weighting_vars = NULL, benchmark_vars = "all",
+                             data  = NULL, treatment = NULL, outcome = NULL, 
+                             selection  = NULL,
                              weighting_method = "ebal", weight_max = Inf,
-                             estimate, RV, sigma2, estimand = "ATT") {
-  names(data)[which(names(data) == paste(outcome))] <- "outcome"
-  names(data)[which(names(data) == paste(treatment))] <- "treatment"
-  if (estimand == "ATT") {
-    sigma2 <- stats::var(data$outcome[data$treatment == 0])
-    data$missing <- data$treatment
-    data$selection <- NA
-  }
-  if (estimand %in% c("PATE", "Survey")) {
-    names(data)[which(names(data) == paste(selection))] <- "selection"
-    if (estimand == "PATE" & is.null(sigma2)) {
-      return("Error: Must specify bound for treatment effect heterogeneity.")
+                             sigma2 = NULL, estimand = "ATT") {
+  if(estimand == "Survey"){
+    if(benchmark_vars == "all"){
+      benchmark_covariates = all.vars(formula)
+      
     }
-    data$missing <- 1 - data$selection
+    df_benchmark = lapply(benchmark_covariates, 
+           benchmark_survey,
+           formula = formula,
+           weights = weights,
+           pop_svy = pop_svy,
+           Y = Y,
+           sample_svy = sample_svy) |> dplyr::bind_rows()
+    
+  }else{
+    names(data)[which(names(data) == paste(outcome))] <- "outcome"
+    names(data)[which(names(data) == paste(treatment))] <- "treatment"
+    if (estimand == "ATT") {
+      sigma2 <- stats::var(data$outcome[data$treatment == 0])
+      data$missing <- data$treatment
+      data$selection <- NA
+    }
+    if (estimand == "PATE") {
+      names(data)[which(names(data) == paste(selection))] <- "selection"
+      if (estimand == "PATE" & is.null(sigma2)) {
+        return("Error: Must specify bound for treatment effect heterogeneity.")
+      }
+      data$missing <- 1 - data$selection
+    }
+    keep_covariates <- append(c("outcome", "treatment", "selection", "missing"), weighting_vars)
+    data <- data |> dplyr::select(keep_covariates)
+    model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
+                                        data = data,
+                                        method = weighting_method, estimand = "ATT"
+    )
+    weights <- model_weights$weights
+    weights = weights/mean(weights)
+    if (benchmark_vars == "all") {
+      benchmark_covariates <- weighting_vars
+    }
+    df_benchmark <- data.frame(
+      lapply(benchmark_covariates, senseweight:::benchmark,
+             weights = weights, data = data, sigma2 = sigma2,
+             weighting_method = weighting_method, weight_max = weight_max, 
+             estimand = estimand
+      ) |>
+        dplyr::bind_rows()
+    )
   }
-  keep_covariates <- append(c("outcome", "treatment", "selection", "missing"), weighting_vars)
-  data <- data |> dplyr::select(keep_covariates)
-  model_weights <- WeightIt::weightit(missing ~ . - selection - treatment - outcome,
-    data = data,
-    method = weighting_method, estimand = "ATT"
-  )
-  weights <- model_weights$weights
-  if (benchmark_vars == "all") {
-    benchmark_vars <- weighting_vars
-  }
-  df_benchmark <- data.frame(
-    lapply(benchmark_vars, benchmark,
-      weights = weights, data = data, sigma2 = sigma2,
-      weighting_method = weighting_method, weight_max = weight_max, estimand = estimand
-    ) |>
-      dplyr::bind_rows()
-  )
+  
   df_benchmark$MRCS <- estimate / df_benchmark$bias
   df_benchmark$k_sigma_min <- RV / df_benchmark$R2_benchmark
   df_benchmark$k_rho_min <- sqrt(RV) / df_benchmark$rho_benchmark
@@ -154,17 +139,16 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 #' 
 #' @param weights Vector of estimated weights
 #' @param Y Outcome of interest
-#' @param Z Treatment assignment
-#' @param b_star TODO (document me!)
+#' @param b_star Killer confounder threshold. If not specified, will be automatically set to 0.
 #' @param estimate (Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}
 #' @param SE (Optional) Standard error associated with the weighted point estimate
 #' @param unweighted (Optional) Unweighted point estimate.
+#' @param Z Treatment assignment (Not needed for settings when users are analyzing surveys)
 #' @param sigma2 (Optional) Variance of outcomes or individual-level treatment effect in PATE case. In the case of a PATE estimator, if not specified, function will automatically estimate an upper bound for the variance of the individual-level treatment effect.
 #' @param estimand Specifies estimand; possible parameters include "ATT", "PATE", or "Survey"
 #' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
-#' @param model TODO (document me!)
-#' @param svy_srs Unweighted survey object
-#' @param svy_wt Weighted survey object
+#' @param svy_srs Unweighted `svymean` object 
+#' @param svy_wt Weighted `svymean` object
 #' 
 #' @return Sensitivity summary
 #' @export
@@ -195,14 +179,17 @@ run_benchmarking <- function(weighting_vars, benchmark_vars = "all",
 # 
 #' # Estimate bound for var(tau):
 #' vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
-#' summarize_sensitivity(weights = weights, Y = df_site$Y, Z = df_site$T, sigma2 = vartau, estimand = "PATE")
-summarize_sensitivity <- function(weights, Y, Z, b_star = 0,
+#' summarize_sensitivity(weights = weights, 
+#' Y = df_site$Y, 
+#' Z = df_site$T, 
+#' sigma2 = vartau,
+#'  estimand = "PATE")
+summarize_sensitivity <- function(weights = NULL, Y = NULL, Z = NULL, b_star = 0,
                                   estimate = NULL, SE = NULL, unweighted = NULL,
                                   sigma2 = NULL, estimand = "ATT", pretty = FALSE,
-                                  model = NULL,
                                   svy_srs = NULL, svy_wt = NULL) {
   if (estimand == "Survey") {
-    if (!is.null(model)) {
+    if (!is.null(svy_srs) & !is.null(svy_wt)) {
       return(summarize_sensitivity_survey(svy_srs, svy_wt, weights, stats::var(Y), b_star))
     } else {
       sigma2 <- stats::var(Y)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/sensitivity_functions.R
 \name{benchmark_parameters}
 \alias{benchmark_parameters}
-\title{Formal benchmarking for sensitivity parameters}
+\title{Helper function for benchmarking for sensitivity parameters}
 \usage{
 benchmark_parameters(
   weights,
@@ -66,9 +66,9 @@ RV <- robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = we
 # Select weighting variables:
 weighting_vars <- names(df_all)[which(!names(df_all) \%in\% c("site", "S", "Y", "T"))]
 
-# Run bechmarking:
+# Run benchmarking:
 df_benchmark <- run_benchmarking(
-  weighting_vars,
+  weighting_vars = weighting_vars,
   data = df_all[, -1],
   treatment = "T", outcome = "Y", selection = "S",
   estimate = ipw,

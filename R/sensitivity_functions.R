@@ -47,7 +47,7 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 }
 
 
-#' Formal benchmarking for sensitivity parameters
+#' Helper function for benchmarking for sensitivity parameters
 #'
 #' Helper function that returns parameter estimates for an omitted variable with specified relative confounding strength to an observed covariate (or set of covariates)
 #' 
@@ -61,7 +61,7 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 #' @param estimand String specifying the estimand of interest. Valid inputs are "PATE", "Augmented", "ATT", or "Survey".
 #' 
 #' @return \code{data.frame} containing estimated parameter values for a confounder with specified relative confounder strength to an observed covariate (or set of covariates), as well as the estimated bias from such an omitted confounder.
-#' @export
+#' @keyword internal
 #' 
 #' @examples
 #' data(jtpa_women)
@@ -94,9 +94,9 @@ robustness_value <- function(estimate, b_star = 0, sigma2, weights) {
 #' # Select weighting variables:
 #' weighting_vars <- names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
 #' 
-#' # Run bechmarking:
+#' # Run benchmarking:
 #' df_benchmark <- run_benchmarking(
-#'   weighting_vars,
+#'   weighting_vars = weighting_vars,
 #'   data = df_all[, -1],
 #'   treatment = "T", outcome = "Y", selection = "S",
 #'   estimate = ipw,
@@ -111,20 +111,8 @@ benchmark_parameters <- function(weights, weights_benchmark, k_sigma = 1, k_rho 
   # Estimate informal calibrated components
   eps_benchmark <- weights_benchmark - weights
   R2 <- stats::var(eps_benchmark) / stats::var(weights)
-  if (estimand == "PATE") {
-    cov_w_calib <- stats::cov(Y[Z == 1], weights_benchmark[Z == 1]) -
-      stats::cov(Y[Z == 0], weights_benchmark[Z == 0])
-    cov_w <- stats::cov(Y[Z == 1], weights[Z == 1]) - stats::cov(Y[Z == 0], weights[Z == 0])
-    cov_benchmark <- cov_w_calib - cov_w
-    rho <- cov_benchmark / (sqrt(sigma2 * stats::var(eps_benchmark)))
-  } else {
-    if (!estimand %in% c("Augmented", "ATT", "Survey")) {
-      return("Invalid Estimand. Estimand must be ATT, PATE, or Survey.")
-    }
-    # Estimand is ATT or Survey:
-    rho <- stats::cor(Y, eps_benchmark)
-  }
-
+  rho <- stats::cor(Y, eps_benchmark)
+  
   # Calculate parameters:
   R2_benchmark <- k_sigma * R2 / (1 + k_sigma * R2)
   rho_benchmark <- k_rho * rho
@@ -284,50 +272,4 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
   } else {
     return(plt)
   }
-}
-
-
-#' Extreme Scenario Plots
-#'
-#' Generates extreme scenario plots, with varying thresholds for the correlation between the true weights and the outcomes
-#' 
-#' @param rho_w Correlation between the estimated weights and the outcomes
-#' @param weights Vector of estimated weights
-#' @param sigma2 Estimated variance of the outcome (i.e., stats::var(Y) for obervational setting; stats::var(tau) for generalization setting)#'
-#' @param estimate Weighted estimate
-#' @param correlations A vector containing possible correlation values between the true weights and the outcomes
-#' 
-#' @return A ggplot2 object, genearting an extreme scenario analysis
-#' @export
-#' 
-#' @examples
-#' # TODO
-extreme_scenario_plot <- function(rho_w, weights, sigma2, estimate, correlations = c(0.25, 0.5, 0.9, 1)) {
-  df_plot <- calculate_extreme_scenario(rho_w, weights, sigma2, correlations)
-  p1 <- df_plot[which(estimate - df_plot$bias >= 0), ] |>
-    ggplot2::ggplot(ggplot2::aes(
-      x = .data$R2_vals, y = estimate - .data$bias, label = .data$label,
-      group = .data$type, linetype = as.factor(abs(.data$type))
-    )) +
-    ggplot2::geom_line() +
-    ggplot2::geom_hline(yintercept = 0, alpha = 0.5) +
-    ggplot2::geom_text(nudge_x = 0.035, size = 3) +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::geom_line(
-      data = df_plot[which(estimate - df_plot$bias < 0), ],
-      ggplot2::aes(
-        x = .data$R2_vals, y = estimate - .data$bias,
-        group = .data$type, linetype = as.factor(abs(.data$type))
-      ), color = "red"
-    ) +
-    ggplot2::geom_text(
-      data = df_plot[which(estimate - df_plot$bias < 0), ], 
-      ggplot2::aes(label = .data$label),
-      color = "black", nudge_x = 0.035, size = 3
-    ) +
-    ggplot2::xlab(expression(R[epsilon]^2)) +
-    ggplot2::ylab("Adjusted Point Estimate (Estimate - Est. Bias)") +
-    ggplot2::ggtitle("Weighted Estimator") +
-    ggplot2::ylim(-25, 25)
-  return(p1)
 }

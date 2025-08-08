@@ -5,9 +5,9 @@
 \title{Sensitivity Summary}
 \usage{
 summarize_sensitivity(
-  weights,
-  Y,
-  Z,
+  weights = NULL,
+  Y = NULL,
+  Z = NULL,
   b_star = 0,
   estimate = NULL,
   SE = NULL,
@@ -15,9 +15,6 @@ summarize_sensitivity(
   sigma2 = NULL,
   estimand = "ATT",
   pretty = FALSE,
-  dependent_var = NULL,
-  model = NULL,
-  outcome_function = NULL,
   svy_srs = NULL,
   svy_wt = NULL
 )
@@ -27,9 +24,9 @@ summarize_sensitivity(
 
 \item{Y}{Outcome of interest}
 
-\item{Z}{Treatment assignment}
+\item{Z}{Treatment assignment (Not needed for settings when users are analyzing surveys)}
 
-\item{b_star}{TODO (document me!)}
+\item{b_star}{Killer confounder threshold. If not specified, will be automatically set to 0.}
 
 \item{estimate}{(Optional) Weighted point estimate. If not specified, function will automatically generate the weighted estimator, given the inputs in \code{Y} and \code{weights}}
 
@@ -43,15 +40,9 @@ summarize_sensitivity(
 
 \item{pretty}{If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.}
 
-\item{dependent_var}{TODO (document me!)}
+\item{svy_srs}{Unweighted \code{svymean} object}
 
-\item{model}{TODO (document me!)}
-
-\item{outcome_function}{TODO (document me!)}
-
-\item{svy_srs}{TODO (document me!)}
-
-\item{svy_wt}{TODO (document me!)}
+\item{svy_wt}{Weighted \code{svymean} object}
 }
 \value{
 Sensitivity summary
@@ -82,5 +73,9 @@ model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
 ipw <- coef(model_ipw)[2]
 # Estimate bound for var(tau):
 vartau <- var(df_site$Y[df_site$T == 1]) - var(df_site$Y[df_site$T == 0])
-summarize_sensitivity(weights = weights, Y = df_site$Y, Z = df_site$T, sigma2 = vartau, estimand = "PATE")
+summarize_sensitivity(weights = weights, 
+Y = df_site$Y, 
+Z = df_site$T, 
+sigma2 = vartau,
+ estimand = "PATE")
 }
