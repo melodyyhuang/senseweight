@@ -79,3 +79,4 @@ df_benchmark <- run_benchmarking(
 print(df_benchmark)
 
 }
+\keyword{internal}

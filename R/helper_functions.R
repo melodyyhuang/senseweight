@@ -88,7 +88,7 @@ benchmark <- function(omit, weights, data, sigma2,
   )
   return(data.frame(
     variable = omit,
-    senseweight:::benchmark_parameters(weights[data$missing == 0] / mean(weights[data$missing == 0]),
+    benchmark_parameters(weights[data$missing == 0] / mean(weights[data$missing == 0]),
                          weights_benchmark[data$missing == 0] / mean(weights_benchmark[data$missing == 0]),
                          data$outcome[data$missing == 0],
                          data$treatment[data$missing == 0],
