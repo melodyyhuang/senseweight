@@ -153,7 +153,7 @@ benchmark_survey <- function(omit, formula, weights, pop_svy,
 
   return(data.frame(
     variable = omit,
-    senseweight:::benchmark_parameters(
+    benchmark_parameters(
       weights,
       weights_benchmark,
       Y = Y,

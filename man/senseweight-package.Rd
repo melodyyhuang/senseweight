@@ -6,7 +6,7 @@
 \alias{senseweight-package}
 \title{senseweight: Sensitivity Analysis for Weighted Estimators}
 \description{
-This package provides functions and an interactive Shiny app to conduct rigorous sensitivity analyses for weighted estimators.
+Provides tools to conduct rigorous sensitivity analyses for weighted estimators, based on (list papers). TODO Add two more sentences that describes specifics of the package.
 }
 \author{
 \strong{Maintainer}: Melody Huang \email{melody.huang@yale.edu}

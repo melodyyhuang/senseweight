@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # senseweight
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/melodyyhuang/senseweight/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/melodyyhuang/senseweight/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `senseweight` implements a set of sensitivity functions and tools to help researchers transparently conduct sensitivity analyses for weighted estimators. `senseweight` allows researchers to assess the sensitivity present in their weighted estimates to omitted confounders. Specific methods provided in `senseweight` include the following: (1) visualization tools to summarize sensitivity; (2) summary tables containing necessary sensitivity statistics; (3) formal benchmarking methods which allow researchers to use observed covariates to assess the plausibility of different confounders. 

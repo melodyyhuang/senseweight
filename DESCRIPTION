@@ -1,13 +1,15 @@
 Package: senseweight
 Type: Package
 Title: Sensitivity Analysis for Weighted Estimators
-Version: 0.0.1.0
+Version: 0.0.1
 Authors@R: 
   c(
     person("Melody", "Huang", , "melody.huang@yale.edu", role = c("aut", "cre")),
     person("Tiffany", "Tang", , "ttang4@nd.edu", role = c("aut"))
   )
-Description: This package provides functions and an interactive Shiny app to conduct rigorous sensitivity analyses for weighted estimators.
+Description: Provides tools to conduct rigorous sensitivity analyses for weighted estimators,
+    based on (list papers). TODO Add two more sentences that describes specifics of the 
+    package. Papers should be listed like Huang (2019) <doi:10.48550/arXiv.1911.01503> 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -29,7 +31,4 @@ Suggests:
     knitr,
     pkgload,
     rmarkdown
-Remotes: 
-    tiffanymtang/shinyWrappers,
-    Yu-Group/vthemes
 VignetteBuilder: knitr

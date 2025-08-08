@@ -7,3 +7,5 @@
 ^rsconnect$
 ^\.rscignore$
 ^data-raw$
+^\.github$
+^cran-comments\.md$

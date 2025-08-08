@@ -116,7 +116,7 @@ run_benchmarking <- function(estimate, RV,
       benchmark_covariates <- weighting_vars
     }
     df_benchmark <- data.frame(
-      lapply(benchmark_covariates, senseweight:::benchmark,
+      lapply(benchmark_covariates, benchmark,
              weights = weights, data = data, sigma2 = sigma2,
              weighting_method = weighting_method, weight_max = weight_max, 
              estimand = estimand
