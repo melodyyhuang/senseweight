@@ -17,9 +17,6 @@
 #' weights = weights/mean(weights)
 #' estimate_bias(rho = 0.5, R2 = 0.5, weights = weights, sigma2 = var(Y))
 estimate_bias <- function(rho, R2, weights, sigma2) {
-  if (R2 >= 1 || R2 < 0) {
-    return("R2 must be bound on interval [0,1)")
-  }
   var_eps <- stats::var(weights) * R2 / (1 - R2)
   return(rho * sqrt(var_eps * sigma2))
 }

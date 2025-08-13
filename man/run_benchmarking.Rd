@@ -18,6 +18,7 @@ run_benchmarking(
   treatment = NULL,
   outcome = NULL,
   selection = NULL,
+  population_targets = NULL,
   weighting_method = "ebal",
   weight_max = Inf,
   sigma2 = NULL,
@@ -50,6 +51,8 @@ run_benchmarking(
 \item{outcome}{Denotes which variable is the outcome variable}
 
 \item{selection}{Denotes which variable is the selection variable}
+
+\item{population_targets}{Population targets for the raking formula in surveys (optional, if not provided, will be generated from pop_svy)}
 
 \item{weighting_method}{Weighting method. Supports weighting methods from the package \code{WeightIt}.}
 

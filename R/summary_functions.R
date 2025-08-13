@@ -15,6 +15,7 @@
 #' @param sample_svy Survey object, containing the survey sample being re-weighted
 #' @param pop_svy Survey object, containing the population the survey sample is being re-weighted to
 #' @param Y outcome of interest (used for survey object)
+#' @param population_targets Population targets for the raking formula in surveys (optional, if not provided, will be generated from pop_svy)
 #' @param weighting_method Weighting method. Supports weighting methods from the package \code{WeightIt}.
 #' @param weight_max Maximum weight to trim at. Default set to \code{Inf}.
 #' @param sigma2 If \code{estimand = "PATE"}, \code{sigma2} must specify the bound on treatment effect heterogeneity. For the other two estimands, the function will automatically calculate the sample variance across the control units, or the survey sample.
@@ -74,6 +75,7 @@ run_benchmarking <- function(estimate, RV,
                              weighting_vars = NULL, benchmark_vars = "all",
                              data  = NULL, treatment = NULL, outcome = NULL, 
                              selection  = NULL,
+                             population_targets = NULL,
                              weighting_method = "ebal", weight_max = Inf,
                              sigma2 = NULL, estimand = "ATT") {
   if(estimand == "Survey"){
@@ -87,7 +89,8 @@ run_benchmarking <- function(estimate, RV,
            weights = weights,
            pop_svy = pop_svy,
            Y = Y,
-           sample_svy = sample_svy) |> dplyr::bind_rows()
+           sample_svy = sample_svy,
+           population_targets = population_targets) |> dplyr::bind_rows()
     
   }else{
     names(data)[which(names(data) == paste(outcome))] <- "outcome"

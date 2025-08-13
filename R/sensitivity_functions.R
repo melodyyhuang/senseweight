@@ -183,8 +183,8 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
   plt <- df_plot |>
     ggplot2::ggplot(ggplot2::aes(x = .data$R2, y = .data$rho, z = .data$bias)) +
     ggplot2::labs(
-      x = expression(R[epsilon]^2),
-      y = expression(rho[epsilon * "," * tau])
+      x = expression(R^2),
+      y = expression(rho)
     )
   if (is.null(binwidth) || is.na(binwidth)) {
     plt <- plt +
@@ -246,7 +246,8 @@ contour_plot <- function(varW, sigma2, killer_confounder, df_benchmark,
           size = point_size
         ) +
         ggrepel::geom_label_repel(
-          ggplot2::aes(x = .data$R2_benchmark, y = .data$rho_benchmark, label = .data$variable),
+          ggplot2::aes(x = .data$R2_benchmark, y = .data$rho_benchmark, 
+                       label = .data$variable),
           data = df_benchmark,
           size = label_size,
           nudge_y = nudge

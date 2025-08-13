@@ -4,12 +4,15 @@ Title: Sensitivity Analysis for Weighted Estimators
 Version: 0.0.1
 Authors@R: 
   c(
-    person("Melody", "Huang", , "melody.huang@yale.edu", role = c("aut", "cre")),
-    person("Tiffany", "Tang", , "ttang4@nd.edu", role = c("aut"))
+    person("Melody", "Huang", , "melody.huang@yale.edu", role = c("aut", "cre"))
   )
 Description: Provides tools to conduct rigorous sensitivity analyses for weighted estimators,
-    based on (list papers). TODO Add two more sentences that describes specifics of the 
-    package. Papers should be listed like Huang (2019) <doi:10.48550/arXiv.1911.01503> 
+    introduced in Huang (2024) <doi:10.1093/jrsssa/qnae012> and 
+    Hartman and Huang (2024) <doi:10.1017>. 
+    The package allows researchers to generate the set of recommended sensitivity summaries
+    to evaluate the sensitivity in their underlying weighting estimators to omitted moderators or confounders. 
+    The tools can be flexibly applied in causal inference settings (i.e., in external and internal validity contexts)
+    or survey contexts. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

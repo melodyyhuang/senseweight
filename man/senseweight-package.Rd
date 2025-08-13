@@ -6,15 +6,17 @@
 \alias{senseweight-package}
 \title{senseweight: Sensitivity Analysis for Weighted Estimators}
 \description{
-Provides tools to conduct rigorous sensitivity analyses for weighted estimators, based on (list papers). TODO Add two more sentences that describes specifics of the package.
+Provides tools to conduct rigorous sensitivity analyses for weighted estimators, introduced in Huang (2024) \doi{10.1093/jrsssa/qnae012} and Hartman and Huang (2024) \doi{10.1017}. The package allows researchers to generate the set of recommended sensitivity summaries to evaluate the sensitivity in their underlying weighting estimators to omitted moderators or confounders. The tools can be flexibly applied in causal inference settings (i.e., in external and internal validity contexts) or survey contexts.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://melodyyhuang.github.io/senseweight/}
+}
+
 }
 \author{
 \strong{Maintainer}: Melody Huang \email{melody.huang@yale.edu}
-
-Authors:
-\itemize{
-  \item Tiffany Tang \email{ttang4@nd.edu}
-}
 
 }
 \keyword{internal}

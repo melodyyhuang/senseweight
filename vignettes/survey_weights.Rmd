@@ -62,7 +62,9 @@ weighted_estimate = svymean(~ candidate, model_rake, na.rm = TRUE)
 
 # Summarizing sensitivity 
 
-With the survey objects, we can now generate our sensitivity summaries. The following function will produce a table that outputs the unweighted estimate, the weighted estimate, and the robustness value corresponding to a threshold bias value. The threshold bias value corresponds to the amount of bias that would result in a change in the substantive takeaway from a result. 
+With the survey objects, we can now generate our sensitivity summaries. The following function will produce a table that outputs the unweighted estimate, the weighted estimate, and the robustness value corresponding to a threshold value $b^*$. The threshold value corresponds to an estimate that would result in a change in the substantive takeaway from a result. 
+
+Here, for illustrative purposes, we set the threshold value to 0.53, which represents a movement that would be 3 times the standard error. We estimate a robustness value of 0.08. This implies that a confounder must result in an error in the weights that explain 8% of the variation in the oracle weights and the outcome in order to result in a killer confounder. 
 
 ```{r}
 summarize_sensitivity(estimand = 'Survey',
@@ -74,6 +76,7 @@ summarize_sensitivity(estimand = 'Survey',
 
 ```
 
+To help reason about the plausibility of potential confounders, we can also perform benchmarking. To benchmark a single covariate, we can use the `benchmark_survey` function: 
 
 ```{r}
 benchmark_survey('educ', 
@@ -83,7 +86,7 @@ benchmark_survey('educ',
                  sample_svy = wapo_srs,
                  Y = wapo$candidate)
 ```
-
+Alternatively, we can choose to benchmark all the covariates by calling `run_benchmarking`:
 ```{r}
 covariates = c("age_buckets", "educ", "gender", "race",
                "educ", "pid", "bornagain")
@@ -101,6 +104,8 @@ print(benchmark_results)
 ```
 
 # Bias contour plot
+
+To visualize the sensitivity of our underlying estimates, we can generate a bias contour plot using the following `contour_plot` function: 
 
 ```{r}
 contour_plot(varW = var(weights), 

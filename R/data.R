@@ -24,7 +24,8 @@
 
 #' Cooperative Election Survey
 #' 
-#' A dataset containing TODO (document the goal of the data)
+#' A subset of the cooperative election survey from 2020, 
+#' corresponding to the state of Michigan. This is a re-coded version created by Hartman and Huang (2024).
 #' 
 #' @name ces
 #' 
@@ -39,8 +40,11 @@
 #' - `vvweight_post`: post-election verified voter weight for the individual
 #' 
 #' @references
-#' TODO (document where you got this from)
+#'“Cooperative Election Study Common Content, 2020.”
+#' Version V4. https://doi.org/10.7910/DVN/E9N6PH
 #' 
+#' "Sensitivity analysis for survey weights," Political Analysis, 32(1) (2024), 1-16.
+#' #' 
 #' @usage
 #' data('ces')
 #' 
@@ -48,9 +52,11 @@
 #' data('ces')
 NULL
 
-#' Washington Post TODO (what is this)
+#' Washington Post Poll
 #' 
-#' A dataset containing data from the WaPo on TODO (document the goal of the data)
+#' A dataset containing data from the ABC/WaPo surveying the 2020 presidential election 
+#' for the state of Michigan (conducted in October 2020). 
+#' This is a re-coded version created by Hartman and Huang (2023).
 #' 
 #' @name wapo
 #' 
@@ -68,7 +74,9 @@ NULL
 #' - `political_interest_full`: full political interest, one of `c('Not so closely', 'Somewhat closely', 'Very closely')`
 #' 
 #' @references
-#' TODO (document where you got this from)
+#' Roper Center for Public Opinion Research (https://ropercenter.cornell.edu/)
+#'
+#' "Sensitivity analysis for survey weights," Political Analysis, 32(1) (2024), 1-16.
 #' 
 #' @usage
 #' data('wapo')

@@ -19,11 +19,16 @@ data('ces')
 }
 }
 \details{
-A dataset containing TODO (document the goal of the data)
+A subset of the cooperative election survey from 2020,
+corresponding to the state of Michigan. This is a re-coded version created by Hartman and Huang (2024).
 }
 \examples{
 data('ces')
 }
 \references{
-TODO (document where you got this from)
+“Cooperative Election Study Common Content, 2020.”
+Version V4. https://doi.org/10.7910/DVN/E9N6PH
+
+"Sensitivity analysis for survey weights," Political Analysis, 32(1) (2024), 1-16.
+#'
 }

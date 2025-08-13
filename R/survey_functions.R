@@ -82,6 +82,7 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #' @param sample_svy Survey object, containing the survey sample being re-weighted
 #' @param pop_svy Survey object, containing the population the survey sample is being re-weighted to
 #' @param Y outcome of interest
+#' @param population_targets Population targets for the raking formula (optional, if not provided, will be generated from pop_svy)
 #' @param weighting_method Weighting method (default to raking)
 #' 
 #' @return Benchmarking results for a variable (or subset of variables)
@@ -126,21 +127,30 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #'  sample_svy = wapo_srs,
 #'  Y = wapo$candidate,
 #'  )
+#'  
 benchmark_survey <- function(omit, formula, weights, pop_svy,
-                             sample_svy, Y, weighting_method = 'raking') {
+                             sample_svy, Y, population_targets = NULL, 
+                             weighting_method = 'raking') {
   if (length(all.vars(formula)) == 1) {
     return(NULL)
   }
   formula_benchmark <- stats::as.formula(paste0(
-    "~",
-    paste0(all.vars(formula)[-which(all.vars(formula) %in% omit)],
-      collapse = " + "
-    )
+      "~",
+      paste0(all.vars(formula)[-which(all.vars(formula) %in% omit)],
+             collapse = " + "
+      )
   ))
-
-  # Set up population targets:
-  population_targets <- create_targets(pop_svy, formula_benchmark)
-
+  if(is.null(population_targets )){
+      
+    # Set up population targets:
+    population_targets <- create_targets(pop_svy, formula_benchmark)
+    
+  }else{
+    omit_char = paste0("^", omit)
+    omit_idx = which(names(population_targets) %in% grep(omit_char, names(population_targets), value = TRUE))
+    population_targets = population_targets[-omit_idx]
+  }
+  
   # Estimate weights;
   model_benchmark <- survey::calibrate(
     design = sample_svy,

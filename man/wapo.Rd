@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{wapo}
 \alias{wapo}
-\title{Washington Post TODO (what is this)}
+\title{Washington Post Poll}
 \usage{
 data('wapo')
 }
@@ -22,11 +22,15 @@ data('wapo')
 }
 }
 \details{
-A dataset containing data from the WaPo on TODO (document the goal of the data)
+A dataset containing data from the ABC/WaPo surveying the 2020 presidential election
+for the state of Michigan (conducted in October 2020).
+This is a re-coded version created by Hartman and Huang (2023).
 }
 \examples{
 data('wapo')
 }
 \references{
-TODO (document where you got this from)
+Roper Center for Public Opinion Research (https://ropercenter.cornell.edu/)
+
+"Sensitivity analysis for survey weights," Political Analysis, 32(1) (2024), 1-16.
 }

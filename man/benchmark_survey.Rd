@@ -11,6 +11,7 @@ benchmark_survey(
   pop_svy,
   sample_svy,
   Y,
+  population_targets = NULL,
   weighting_method = "raking"
 )
 }
@@ -26,6 +27,8 @@ benchmark_survey(
 \item{sample_svy}{Survey object, containing the survey sample being re-weighted}
 
 \item{Y}{outcome of interest}
+
+\item{population_targets}{Population targets for the raking formula (optional, if not provided, will be generated from pop_svy)}
 
 \item{weighting_method}{Weighting method (default to raking)}
 }
@@ -74,4 +77,5 @@ benchmark_survey('educ',
  sample_svy = wapo_srs,
  Y = wapo$candidate,
  )
+ 
 }
