@@ -75,45 +75,54 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ces</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">wapo</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">wapo_srs</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span>ids <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">wapo</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">poll.data</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">poll_srs</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span>ids <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poll.data</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>No weights or probabilities supplied, assuming equal probability</span>
-<span class="r-in"><span><span class="va">ces_awt</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span>ids <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                     weights <span class="op">=</span> <span class="op">~</span> <span class="va">vvweight_post</span>,</span></span>
-<span class="r-in"><span>                     data <span class="op">=</span> <span class="va">ces</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">pop_targets</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.212</span>, <span class="fl">0.264</span>, <span class="fl">0.236</span>, <span class="fl">0.310</span>, </span></span>
+<span class="r-in"><span>                <span class="fl">0.114</span>, <span class="fl">0.360</span>, <span class="fl">0.528</span>, <span class="fl">0.114</span>, </span></span>
+<span class="r-in"><span>                <span class="fl">0.021</span>, <span class="fl">0.034</span>, <span class="fl">0.805</span>, </span></span>
+<span class="r-in"><span>                <span class="fl">0.266</span>, <span class="fl">0.075</span>, <span class="fl">0.312</span>, <span class="fl">0.349</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pop_targets</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(Intercept)"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"age_buckets36to50"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"age_buckets51to64"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"age_bucketsOver65"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"educHigh School or Less"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"educPost-grad"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"educSome college"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"genderWomen"</span>, </span></span>
+<span class="r-in"><span>                       <span class="st">"raceBlack"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"raceHispanic"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"raceOther"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"raceWhite"</span>, </span></span>
+<span class="r-in"><span>                       <span class="st">"pidIndependent"</span>, <span class="st">"pidOther"</span>, </span></span>
+<span class="r-in"><span>                       <span class="st">"pidRepublican"</span>, <span class="st">"bornagainYes"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">#Set up raking formula:</span></span></span>
-<span class="r-in"><span><span class="va">formula_rake</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">age_buckets</span> <span class="op">+</span> <span class="va">educ</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">educ</span> <span class="op">*</span> <span class="va">pid</span> <span class="op">+</span> <span class="va">bornagain</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">#Generate targets:</span></span></span>
-<span class="r-in"><span><span class="va">targets_rake</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_targets.html">create_targets</a></span><span class="op">(</span><span class="va">ces_awt</span>, <span class="va">formula_rake</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">formula_rake</span> <span class="op">&lt;-</span> <span class="op">~</span> <span class="va">age_buckets</span> <span class="op">+</span> <span class="va">educ</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">pid</span> <span class="op">+</span> <span class="va">bornagain</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#PERFORM RAKING:</span></span></span>
 <span class="r-in"><span><span class="va">model_rake</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/calibrate.html" class="external-link">calibrate</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  design <span class="op">=</span> <span class="va">wapo_srs</span>,</span></span>
+<span class="r-in"><span>  design <span class="op">=</span> <span class="va">poll_srs</span>,</span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">formula_rake</span>,</span></span>
-<span class="r-in"><span>  population <span class="op">=</span> <span class="va">targets_rake</span>,</span></span>
+<span class="r-in"><span>  population <span class="op">=</span> <span class="va">pop_targets</span>,</span></span>
 <span class="r-in"><span>  calfun <span class="op">=</span> <span class="st">"raking"</span>,</span></span>
 <span class="r-in"><span>  force <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">rake_results</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">wapo</span>, weights <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">model_rake</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">rake_results</span> <span class="op">&lt;-</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poll.data</span>, weights <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">model_rake</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">#Estimate from raking results:</span></span></span>
 <span class="r-in"><span><span class="va">weights</span> <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/weights.html" class="external-link">weights</a></span><span class="op">(</span><span class="va">rake_results</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">model_rake</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#Normalize to mean 1:</span></span></span>
-<span class="r-in"><span><span class="va">weights</span> <span class="op">=</span> <span class="va">weights</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">unweighted_estimate</span> <span class="op">=</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">candidate</span>, <span class="va">wapo_srs</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">weighted_estimate</span> <span class="op">=</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">candidate</span>, <span class="va">model_rake</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">unweighted_estimate</span> <span class="op">=</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Y</span>, <span class="va">poll_srs</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">weighted_estimate</span> <span class="op">=</span> <span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Y</span>, <span class="va">model_rake</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="summarize_sensitivity.html">summarize_sensitivity</a></span><span class="op">(</span>estimand <span class="op">=</span> <span class="st">'Survey'</span>,</span></span>
-<span class="r-in"><span>Y <span class="op">=</span> <span class="va">wapo</span><span class="op">$</span><span class="va">candidate</span>,</span></span>
+<span class="r-in"><span>Y <span class="op">=</span> <span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span>,</span></span>
 <span class="r-in"><span>weights <span class="op">=</span> <span class="va">weights</span>,</span></span>
 <span class="r-in"><span>svy_srs <span class="op">=</span> <span class="va">unweighted_estimate</span>, </span></span>
 <span class="r-in"><span>svy_wt <span class="op">=</span> <span class="va">weighted_estimate</span>,</span></span>
-<span class="r-in"><span>b_star <span class="op">=</span> <span class="fl">0.53</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Unweighted Unweighted_SE  Estimate         SE   RV</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5092251    0.01754357 0.4989841 0.01313149 0.08</span>
+<span class="r-in"><span>b_star <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Unweighted Unweighted_SE Estimate         SE   RV</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.52    0.01580664 0.489811 0.01578579 0.02</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
