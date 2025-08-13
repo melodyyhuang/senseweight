@@ -12,42 +12,51 @@
 #' @export
 #' 
 #' @examples
-#' data(ces)
-#' data(wapo)
-#' wapo_srs <- survey::svydesign(ids = ~ 1, data = wapo)
-#' ces_awt <- survey::svydesign(ids = ~ 1,
-#'                      weights = ~ vvweight_post,
-#'                      data = ces)
-#' 
+#' data(poll.data)
+#' poll_srs <- survey::svydesign(ids = ~ 1, data = poll.data)
+#' pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 
+#'                 0.114, 0.360, 0.528, 0.114, 
+#'                 0.021, 0.034, 0.805, 
+#'                 0.266, 0.075, 0.312, 0.349)
+#' names(pop_targets) = c("(Intercept)",
+#'                        "age_buckets36to50",
+#'                        "age_buckets51to64",
+#'                        "age_bucketsOver65",
+#'                        "educHigh School or Less",
+#'                        "educPost-grad",
+#'                        "educSome college",
+#'                        "genderWomen", 
+#'                        "raceBlack",
+#'                        "raceHispanic",
+#'                        "raceOther",
+#'                        "raceWhite", 
+#'                        "pidIndependent", "pidOther", 
+#'                        "pidRepublican", "bornagainYes")
 #' #Set up raking formula:
-#' formula_rake <- ~ age_buckets + educ + gender + race + educ * pid + bornagain
-#' 
-#' #Generate targets:
-#' targets_rake <- create_targets(ces_awt, formula_rake)
+#' formula_rake <- ~ age_buckets + educ + gender + race + pid + bornagain
 #' 
 #' #PERFORM RAKING:
 #' model_rake <- survey::calibrate(
-#'   design = wapo_srs,
+#'   design = poll_srs,
 #'   formula = formula_rake,
-#'   population = targets_rake,
+#'   population = pop_targets,
 #'   calfun = "raking",
 #'   force = TRUE
 #' )
 #' 
-#' rake_results <- survey::svydesign( ~ 1, data = wapo, weights = stats::weights(model_rake))
+#' 
+#' rake_results <- survey::svydesign( ~ 1, data = poll.data, weights = stats::weights(model_rake))
 #' #Estimate from raking results:
 #' weights = stats::weights(rake_results) * nrow(model_rake)
-#' #Normalize to mean 1:
-#' weights = weights / mean(weights)
 #' 
-#' unweighted_estimate = survey::svymean(~ candidate, wapo_srs, na.rm = TRUE)
-#' weighted_estimate = survey::svymean(~ candidate, model_rake, na.rm = TRUE)
+#' unweighted_estimate = survey::svymean(~ Y, poll_srs, na.rm = TRUE)
+#' weighted_estimate = survey::svymean(~ Y, model_rake, na.rm = TRUE)
 #' summarize_sensitivity(estimand = 'Survey',
-#' Y = wapo$candidate,
+#' Y = poll.data$Y,
 #' weights = weights,
 #' svy_srs = unweighted_estimate, 
 #' svy_wt = weighted_estimate,
-#' b_star = 0.53)
+#' b_star = 0.5)
 
 summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star = 0) {
   estimate_srs <- as.data.frame(svy_srs)[, 1]
@@ -89,46 +98,53 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
 #' @export
 #' 
 #' @examples 
-#' 
-#' data(ces)
-#' data(wapo)
-#' wapo_srs <- survey::svydesign(ids = ~ 1, data = wapo)
-#' ces_awt <- survey::svydesign(ids = ~ 1,
-#'                      weights = ~ vvweight_post,
-#'                      data = ces)
-#' 
+#' data(poll.data)
+#' poll_srs <- survey::svydesign(ids = ~ 1, data = poll.data)
+#' pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 
+#'                 0.114, 0.360, 0.528, 0.114, 
+#'                 0.021, 0.034, 0.805, 
+#'                 0.266, 0.075, 0.312, 0.349)
+#' names(pop_targets) = c("(Intercept)",
+#'                        "age_buckets36to50",
+#'                        "age_buckets51to64",
+#'                        "age_bucketsOver65",
+#'                        "educHigh School or Less",
+#'                        "educPost-grad",
+#'                        "educSome college",
+#'                        "genderWomen", 
+#'                        "raceBlack",
+#'                        "raceHispanic",
+#'                        "raceOther",
+#'                        "raceWhite", 
+#'                        "pidIndependent", "pidOther", 
+#'                        "pidRepublican", "bornagainYes")
 #' #Set up raking formula:
-#' formula_rake <- ~ age_buckets + educ + gender + race + educ * pid + bornagain
-#' 
-#' #Generate targets:
-#' targets_rake <- create_targets(ces_awt, formula_rake)
+#' formula_rake <- ~ age_buckets + educ + gender + race + pid + bornagain
 #' 
 #' #PERFORM RAKING:
 #' model_rake <- survey::calibrate(
-#'   design = wapo_srs,
+#'   design = poll_srs,
 #'   formula = formula_rake,
-#'   population = targets_rake,
+#'   population = pop_targets,
 #'   calfun = "raking",
 #'   force = TRUE
 #' )
 #' 
-#' rake_results <- survey::svydesign( ~ 1, data = wapo, weights = stats::weights(model_rake))
+#' 
+#' rake_results <- survey::svydesign( ~ 1, data = poll.data, weights = stats::weights(model_rake))
 #' #Estimate from raking results:
 #' weights = stats::weights(rake_results) * nrow(model_rake)
-#' #Normalize to mean 1:
-#' weights = weights / mean(weights)
 #' 
-#' unweighted_estimate = survey::svymean(~ candidate, wapo_srs, na.rm = TRUE)
-#' weighted_estimate = survey::svymean(~ candidate, model_rake, na.rm = TRUE)
+#' unweighted_estimate = survey::svymean(~ Y, poll_srs, na.rm = TRUE)
+#' weighted_estimate = survey::svymean(~ Y, model_rake, na.rm = TRUE)
 #' benchmark_survey('educ', 
-#'  formula = formula_rake,
-#'  weights = weights,
-#'  pop_svy = ces_awt,
-#'  sample_svy = wapo_srs,
-#'  Y = wapo$candidate,
-#'  )
+#'                  formula = formula_rake,
+#'                  weights = weights,
+#'                  population_targets = pop_targets,
+#'                  sample_svy = poll_srs,
+#'                  Y = poll.data$Y)
 #'  
-benchmark_survey <- function(omit, formula, weights, pop_svy,
+benchmark_survey <- function(omit, formula, weights, pop_svy = NULL,
                              sample_svy, Y, population_targets = NULL, 
                              weighting_method = 'raking') {
   if (length(all.vars(formula)) == 1) {

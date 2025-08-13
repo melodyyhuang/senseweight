@@ -18,15 +18,14 @@ Weighting target for survey objects
 Returns weighting targets for survey objects.
 }
 \examples{
-data(ces)
-ces_awt = survey::svydesign(ids = ~ 1,
-                     weights = ~ vvweight_post,
-                     data = ces)
+data(poll.data)
+poll.svy = survey::svydesign(ids = ~ 1,
+                     data = poll.data)
 
 #Set up raking formula:
 formula_rake = ~ age_buckets + educ + gender + race + educ * pid + bornagain
 
 #Generate targets:
-targets_rake = create_targets(ces_awt, formula_rake)
+targets_rake = create_targets(poll.svy, formula_rake)
 
 }

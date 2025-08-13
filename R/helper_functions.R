@@ -32,16 +32,15 @@ estimate_bias <- function(rho, R2, weights, sigma2) {
 #' @export
 #' 
 #' @examples
-#' data(ces)
-#' ces_awt = survey::svydesign(ids = ~ 1,
-#'                      weights = ~ vvweight_post,
-#'                      data = ces)
+#' data(poll.data)
+#' poll.svy = survey::svydesign(ids = ~ 1,
+#'                      data = poll.data)
 #' 
 #' #Set up raking formula:
 #' formula_rake = ~ age_buckets + educ + gender + race + educ * pid + bornagain
 #' 
 #' #Generate targets:
-#' targets_rake = create_targets(ces_awt, formula_rake)
+#' targets_rake = create_targets(poll.svy, formula_rake)
 #' 
 create_targets <- function(target_design, target_formula) {
   target_mf <- stats::model.frame(target_formula, stats::model.frame(target_design))
