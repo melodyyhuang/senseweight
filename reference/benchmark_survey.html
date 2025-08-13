@@ -48,6 +48,7 @@
 <span>  <span class="va">pop_svy</span>,</span>
 <span>  <span class="va">sample_svy</span>,</span>
 <span>  <span class="va">Y</span>,</span>
+<span>  population_targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weighting_method <span class="op">=</span> <span class="st">"raking"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -78,6 +79,10 @@
 
 <dt id="arg-y">Y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>outcome of interest</p></dd>
+
+
+<dt id="arg-population-targets">population_targets<a class="anchor" aria-label="anchor" href="#arg-population-targets"></a></dt>
+<dd><p>Population targets for the raking formula (optional, if not provided, will be generated from pop_svy)</p></dd>
 
 
 <dt id="arg-weighting-method">weighting_method<a class="anchor" aria-label="anchor" href="#arg-weighting-method"></a></dt>
@@ -132,6 +137,7 @@
 <span class="r-in"><span> <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   variable R2_benchmark rho_benchmark        bias</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     educ    0.3431964    0.01912583 0.005221487</span>
+<span class="r-in"><span> </span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -139,7 +145,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Melody Huang, Tiffany Tang.</p>
+  <p>Developed by Melody Huang.</p>
 </div>
 
 <div class="pkgdown-footer-right">

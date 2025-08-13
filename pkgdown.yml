@@ -3,7 +3,7 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   survey_weights: survey_weights.html
-last_built: 2025-08-08T18:17Z
+last_built: 2025-08-13T18:02Z
 urls:
   reference: https://melodyyhuang.github.io/senseweight/reference
   article: https://melodyyhuang.github.io/senseweight/articles

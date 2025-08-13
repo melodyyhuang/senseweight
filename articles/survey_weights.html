@@ -116,9 +116,16 @@ we will set up different survey objects for our analysis.</p>
 <p>With the survey objects, we can now generate our sensitivity
 summaries. The following function will produce a table that outputs the
 unweighted estimate, the weighted estimate, and the robustness value
-corresponding to a threshold bias value. The threshold bias value
-corresponds to the amount of bias that would result in a change in the
-substantive takeaway from a result.</p>
+corresponding to a threshold value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>b</mi><mo>*</mo></msup><annotation encoding="application/x-tex">b^*</annotation></semantics></math>.
+The threshold value corresponds to an estimate that would result in a
+change in the substantive takeaway from a result.</p>
+<p>Here, for illustrative purposes, we set the threshold value to 0.53,
+which represents a movement that would be 3 times the standard error. We
+estimate a robustness value of 0.08. This implies that a confounder must
+result in an error in the weights that explain 8% of the variation in
+the oracle weights and the outcome in order to result in a killer
+confounder.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarize_sensitivity.html">summarize_sensitivity</a></span><span class="op">(</span>estimand <span class="op">=</span> <span class="st">'Survey'</span>,</span>
 <span>                      Y <span class="op">=</span> <span class="va">wapo</span><span class="op">$</span><span class="va">candidate</span>,</span>
@@ -128,6 +135,9 @@ substantive takeaway from a result.</p>
 <span>                      b_star <span class="op">=</span> <span class="fl">0.53</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Unweighted Unweighted_SE  Estimate         SE   RV</span></span>
 <span><span class="co">#&gt; 1  0.5092251    0.01754357 0.4992384 0.01347646 0.08</span></span></code></pre></div>
+<p>To help reason about the plausibility of potential confounders, we
+can also perform benchmarking. To benchmark a single covariate, we can
+use the <code>benchmark_survey</code> function:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/benchmark_survey.html">benchmark_survey</a></span><span class="op">(</span><span class="st">'educ'</span>, </span>
 <span>                 formula <span class="op">=</span> <span class="va">formula_rake</span>,</span>
@@ -137,6 +147,8 @@ substantive takeaway from a result.</p>
 <span>                 Y <span class="op">=</span> <span class="va">wapo</span><span class="op">$</span><span class="va">candidate</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   variable R2_benchmark rho_benchmark        bias</span></span>
 <span><span class="co">#&gt; 1     educ    0.3005875    0.02176965 0.004966802</span></span></code></pre></div>
+<p>Alternatively, we can choose to benchmark all the covariates by
+calling <code>run_benchmarking</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covariates</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_buckets"</span>, <span class="st">"educ"</span>, <span class="st">"gender"</span>, <span class="st">"race"</span>,</span>
 <span>               <span class="st">"educ"</span>, <span class="st">"pid"</span>, <span class="st">"bornagain"</span><span class="op">)</span></span>
@@ -161,6 +173,9 @@ substantive takeaway from a result.</p>
 <div class="section level2">
 <h2 id="bias-contour-plot">Bias contour plot<a class="anchor" aria-label="anchor" href="#bias-contour-plot"></a>
 </h2>
+<p>To visualize the sensitivity of our underlying estimates, we can
+generate a bias contour plot using the following
+<code>contour_plot</code> function:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/contour_plot.html">contour_plot</a></span><span class="op">(</span>varW <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>, </span>
 <span>             sigma2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">wapo</span><span class="op">$</span><span class="va">candidate</span><span class="op">)</span>,</span>
@@ -177,7 +192,7 @@ substantive takeaway from a result.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Melody Huang, Tiffany Tang.</p>
+  <p>Developed by Melody Huang.</p>
 </div>
 
 <div class="pkgdown-footer-right">

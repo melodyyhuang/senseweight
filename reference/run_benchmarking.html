@@ -55,6 +55,7 @@
 <span>  treatment <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  selection <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  population_targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weighting_method <span class="op">=</span> <span class="st">"ebal"</span>,</span>
 <span>  weight_max <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  sigma2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -116,6 +117,10 @@
 
 <dt id="arg-selection">selection<a class="anchor" aria-label="anchor" href="#arg-selection"></a></dt>
 <dd><p>Denotes which variable is the selection variable</p></dd>
+
+
+<dt id="arg-population-targets">population_targets<a class="anchor" aria-label="anchor" href="#arg-population-targets"></a></dt>
+<dd><p>Population targets for the raking formula in surveys (optional, if not provided, will be generated from pop_svy)</p></dd>
 
 
 <dt id="arg-weighting-method">weighting_method<a class="anchor" aria-label="anchor" href="#arg-weighting-method"></a></dt>
@@ -197,7 +202,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Melody Huang, Tiffany Tang.</p>
+  <p>Developed by Melody Huang.</p>
 </div>
 
 <div class="pkgdown-footer-right">
