@@ -1,0 +1,128 @@
+---
+title: "Sensitivity analysis for external validity"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{external-validity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+```
+
+In the following vignette, we will walk through a basic example of how to conduct a sensitivity analysis for external validity using `senseweight`. We will use a subset of the JTPA data. 
+
+```{r example, warning=FALSE, message = FALSE}
+library(senseweight)
+library(ggplot2)
+# Load in JTPA data:
+data(jtpa_women)
+```
+
+
+```{r}
+# Summarize sites
+jtpa_women |>
+  dplyr::group_by(site) |>
+  dplyr::summarize(
+    length(prevearn),
+    dplyr::across(
+      c(prevearn, age, married, hrwage, black, hispanic, hsorged, yrs_educ), 
+      mean
+    )
+  )
+```
+
+
+Assume researchers are interested in generalizing the results from the site of Omaha, Nebraska to the other 15 experimental sites: 
+```{r estimate}
+site_name <- "NE"
+df_site <- jtpa_women[which(jtpa_women$site == site_name), ]
+df_else <- jtpa_women[which(jtpa_women$site != site_name), ]
+
+# Estimate unweighted estimator:
+model_dim <- estimatr::lm_robust(Y ~ T, data = df_site)
+PATE <- coef(lm(Y ~ T, data = df_else))[2]
+DiM <- coef(model_dim)[2]
+
+# Generate weights using observed covariates:
+df_all <- jtpa_women
+df_all$S <- ifelse(jtpa_women$site == "NE", 1, 0)
+model_ps <- WeightIt::weightit(
+  (1 - S) ~ . - site - T - Y, 
+  data = df_all, method = "ebal", estimand = "ATT"
+)
+weights <- model_ps$weights[df_all$S == 1]
+
+# Estimate IPW model:
+model_ipw <- estimatr::lm_robust(Y ~ T, data = df_site, weights = weights)
+ipw <- coef(model_ipw)[2]
+
+# Estimate bound for var(tau):
+m <- sqrt(stats::var(df_site$Y[df_site$T == 1]) / stats::var(df_site$Y[df_site$T == 0]))
+# Since m > 1:
+vartau <- stats::var(df_site$Y[df_site$T == 1]) - stats::var(df_site$Y[df_site$T == 0])
+```
+
+# Sensitivity Summary Measures 
+
+## Robustness value
+We can generate the sensitivity summary measures using the `summarize_sensitivity` function: 
+```{r summaries}
+summarize_sensitivity(
+  weights = weights, 
+  Y = df_site$Y, 
+  Z = df_site$T, 
+  sigma2 = vartau, 
+  estimand = "PATE"
+)
+```
+
+
+The `summarize_sensitivity` function defaults to evaluating the robustness value at `q=1`, indicating a robustness value, relative to a bias equal to the point estimate. Researchers can specify different values for `q` in the function. In the generalization setting, researchers can modify the `sigma2` bound and posit their own values for a plausible bound (given substantive justification). With no specification, `sigma2` will be automatically calculated to be bound by `var(Y(1)) + var(Y(0))`. 
+
+```{r}
+RV = robustness_value(estimate = ipw, b_star = 0, sigma2 = vartau, weights = weights)
+print(RV)
+```
+
+## Benchmarking
+```{r benchmarking}
+# Select weighting variables:
+weighting_vars = names(df_all)[which(!names(df_all) %in% c("site", "S", "Y", "T"))]
+
+# Run bechmarking:
+df_benchmark <- run_benchmarking(
+  weighting_vars = weighting_vars,
+  data = df_all[, -1],
+  treatment = "T", outcome = "Y", selection = "S",
+  estimate = ipw,
+  RV = RV, sigma2 = vartau,
+  estimand = "PATE"
+)
+
+
+print(df_benchmark)
+```
+
+## Bias Contour Plot
+```{r contour_plot, warning=FALSE, fig.width=6.5, fig.height=5}
+contour_plot(
+  var(weights), vartau, ipw, df_benchmark,
+  benchmark = TRUE, shade = TRUE,
+  shade_var = c("age", "prevearn"),
+  label_size = 4
+) +
+  geom_point(aes(x = RV, y = sqrt(RV))) +
+  annotate("text",
+    x = RV - 0.01, y = sqrt(RV) + 0.02,
+    label = expression(RV[1] * "= 0.41"), hjust = 0, vjust = 0, size = 3
+  )
+```
+

@@ -1,10 +1,11 @@
 ---
-title: "Conducting sensitivity analysis for survey weights"
+title: "Sensitivity analysis for survey weights"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example for Survey Weighting}
+  %\VignetteIndexEntry{survey}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  
 ---
 
 ```{r, include = FALSE}
@@ -12,6 +13,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 In the following vignette, we will walk through how to conduct a sensitivity analysis for survey weights using `senseweight`. 
