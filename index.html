@@ -6,9 +6,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Sensitivity Analysis for Weighted Estimators • senseweight</title>
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Fira_Code-0.4.10/font.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Sensitivity Analysis for Weighted Estimators">
 <meta name="description" content="Provides tools to conduct rigorous sensitivity analyses for weighted estimators, introduced in Huang (2024) &lt;doi:10.1093/jrsssa/qnae012&gt; and Hartman and Huang (2024) &lt;doi:10.1017&gt;. The package allows researchers to generate the set of recommended sensitivity summaries to evaluate the sensitivity in their underlying weighting estimators to omitted moderators or confounders. The tools can be flexibly applied in causal inference settings (i.e., in external and internal validity contexts) or survey contexts.">
@@ -18,7 +19,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">senseweight</a>
 
@@ -35,7 +36,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/survey_weights.html">Conducting sensitivity analysis for survey weights</a></li>
+<li><a class="dropdown-item" href="articles/external-validity.html">Sensitivity analysis for external validity</a></li>
+    <li><a class="dropdown-item" href="articles/survey.html">Sensitivity analysis for survey weights</a></li>
   </ul>
 </li>
       </ul>
@@ -43,6 +45,14 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -54,7 +64,7 @@
 <div class="page-header"><h1 id="senseweight">senseweight<a class="anchor" aria-label="anchor" href="#senseweight"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
+
 <p><code>senseweight</code> implements a set of sensitivity functions and tools to help researchers transparently conduct sensitivity analyses for weighted estimators. <code>senseweight</code> allows researchers to assess the sensitivity present in their weighted estimates to omitted confounders. Specific methods provided in <code>senseweight</code> include the following: (1) visualization tools to summarize sensitivity; (2) summary tables containing necessary sensitivity statistics; (3) formal benchmarking methods which allow researchers to use observed covariates to assess the plausibility of different confounders.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -65,155 +75,19 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"melodyyhuang/senseweight"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p><a href="https://academic.oup.com/jrsssa/advance-article-abstract/doi/10.1093/jrsssa/qnae012/7626119" class="external-link">Huang, Melody. “Sensitivity Analysis in the Generalization of Experimental Results.” Journal of the Royal Statistical Society Series A: Statistics in Society (2024)</a></p>
-</div>
-<div class="section level2">
-<h2 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
-</h2>
-<p>The example below illustrates how to use the <code>senseweight</code> package for external validity. Examples of how to use <code>senseweight</code> for internal validity or survey weighting are forthcoming.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://melodyyhuang.github.io/senseweight/">senseweight</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load in JTPA data:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">jtpa_women</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Summarize sites</span></span>
-<span><span class="va">jtpa_women</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">site</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarize</span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">prevearn</span><span class="op">)</span>,</span>
-<span>    <span class="fu">across</span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prevearn</span>, <span class="va">age</span>, <span class="va">married</span>, <span class="va">hrwage</span>, <span class="va">black</span>, <span class="va">hispanic</span>, <span class="va">hsorged</span>, <span class="va">yrs_educ</span><span class="op">)</span>, </span>
-<span>      <span class="va">mean</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 16 × 10</span></span>
-<span><span class="co">#&gt;    site  `length(prevearn)` prevearn   age married hrwage   black hispanic</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;              &lt;int&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 CC                   524    1855.  32.1  0.219    479. 0.101    0.693  </span></span>
-<span><span class="co">#&gt;  2 CI                   190    2250.  33.5  0.253    458. 0.0684   0.0105 </span></span>
-<span><span class="co">#&gt;  3 CV                   788    2192.  33.6  0.278    455. 0.173    0.00635</span></span>
-<span><span class="co">#&gt;  4 HF                   234    1997.  31.6  0.184    455. 0.432    0.0342 </span></span>
-<span><span class="co">#&gt;  5 IN                  1392    3172.  34.9  0.193    466. 0.243    0.0194 </span></span>
-<span><span class="co">#&gt;  6 JC                    81    2564.  30.6  0.136    531. 0.642    0.247  </span></span>
-<span><span class="co">#&gt;  7 JK                   353    1928.  30.0  0.113    453. 0.912    0      </span></span>
-<span><span class="co">#&gt;  8 LC                   485    3039.  33.9  0.258    464. 0.0165   0.165  </span></span>
-<span><span class="co">#&gt;  9 MD                   177    2915.  34.6  0.181    480. 0.367    0      </span></span>
-<span><span class="co">#&gt; 10 MN                   179    2215.  37.6  0.352    454. 0.00559  0.0782 </span></span>
-<span><span class="co">#&gt; 11 MT                    38    1680.  33.8  0.395    474. 0        0.0526 </span></span>
-<span><span class="co">#&gt; 12 NE                   636    2161.  31.7  0.0975   477. 0.511    0.0377 </span></span>
-<span><span class="co">#&gt; 13 OH                    74    2568.  34.6  0.324    486. 0.0135   0      </span></span>
-<span><span class="co">#&gt; 14 OK                    87    2320.  37.3  0.126    586. 0.759    0.0805 </span></span>
-<span><span class="co">#&gt; 15 PR                   463    1783.  32.8  0.0842   506. 0.268    0.378  </span></span>
-<span><span class="co">#&gt; 16 SM                   401    2997.  32.2  0.284    429. 0.0200   0.00249</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: hsorged &lt;dbl&gt;, yrs_educ &lt;dbl&gt;</span></span></code></pre></div>
-<p>Assume researchers are interested in generalizing the results from the site of Omaha, Nebraska to the other 15 experimental sites:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">site_name</span> <span class="op">&lt;-</span> <span class="st">"NE"</span></span>
-<span><span class="va">df_site</span> <span class="op">&lt;-</span> <span class="va">jtpa_women</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">jtpa_women</span><span class="op">$</span><span class="va">site</span> <span class="op">==</span> <span class="va">site_name</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">df_else</span> <span class="op">&lt;-</span> <span class="va">jtpa_women</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">jtpa_women</span><span class="op">$</span><span class="va">site</span> <span class="op">!=</span> <span class="va">site_name</span><span class="op">)</span>, <span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Estimate unweighted estimator:</span></span>
-<span><span class="va">model_dim</span> <span class="op">&lt;-</span> <span class="fu">estimatr</span><span class="fu">::</span><span class="fu"><a href="https://declaredesign.org/r/estimatr/reference/lm_robust.html" class="external-link">lm_robust</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="cn">T</span>, data <span class="op">=</span> <span class="va">df_site</span><span class="op">)</span></span>
-<span><span class="va">PATE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="cn">T</span>, data <span class="op">=</span> <span class="va">df_else</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span><span class="va">DiM</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_dim</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Generate weights using observed covariates:</span></span>
-<span><span class="va">df_all</span> <span class="op">&lt;-</span> <span class="va">jtpa_women</span></span>
-<span><span class="va">df_all</span><span class="op">$</span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">jtpa_women</span><span class="op">$</span><span class="va">site</span> <span class="op">==</span> <span class="st">"NE"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">model_ps</span> <span class="op">&lt;-</span> <span class="fu">WeightIt</span><span class="fu">::</span><span class="fu"><a href="https://ngreifer.github.io/WeightIt/reference/weightit.html" class="external-link">weightit</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">S</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="va">site</span> <span class="op">-</span> <span class="cn">T</span> <span class="op">-</span> <span class="va">Y</span>, </span>
-<span>  data <span class="op">=</span> <span class="va">df_all</span>, method <span class="op">=</span> <span class="st">"ebal"</span>, estimand <span class="op">=</span> <span class="st">"ATT"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="va">model_ps</span><span class="op">$</span><span class="va">weights</span><span class="op">[</span><span class="va">df_all</span><span class="op">$</span><span class="va">S</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Estimate IPW model:</span></span>
-<span><span class="va">model_ipw</span> <span class="op">&lt;-</span> <span class="fu">estimatr</span><span class="fu">::</span><span class="fu"><a href="https://declaredesign.org/r/estimatr/reference/lm_robust.html" class="external-link">lm_robust</a></span><span class="op">(</span><span class="va">Y</span> <span class="op">~</span> <span class="cn">T</span>, data <span class="op">=</span> <span class="va">df_site</span>, weights <span class="op">=</span> <span class="va">weights</span><span class="op">)</span></span>
-<span><span class="va">ipw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_ipw</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Estimate bound for var(tau):</span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">df_site</span><span class="op">$</span><span class="va">Y</span><span class="op">[</span><span class="va">df_site</span><span class="op">$</span><span class="cn">T</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">df_site</span><span class="op">$</span><span class="va">Y</span><span class="op">[</span><span class="va">df_site</span><span class="op">$</span><span class="cn">T</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># Since m &gt; 1:</span></span>
-<span><span class="va">vartau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">df_site</span><span class="op">$</span><span class="va">Y</span><span class="op">[</span><span class="va">df_site</span><span class="op">$</span><span class="cn">T</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">df_site</span><span class="op">$</span><span class="va">Y</span><span class="op">[</span><span class="va">df_site</span><span class="op">$</span><span class="cn">T</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="sensitivity-summary-measures">Sensitivity Summary Measures<a class="anchor" aria-label="anchor" href="#sensitivity-summary-measures"></a>
-</h3>
-<p>We can generate the sensitivity summary measures using the <code>summarize_sensitivity</code> function:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/summarize_sensitivity.html">summarize_sensitivity</a></span><span class="op">(</span></span>
-<span>  weights <span class="op">=</span> <span class="va">weights</span>, </span>
-<span>  Y <span class="op">=</span> <span class="va">df_site</span><span class="op">$</span><span class="va">Y</span>, </span>
-<span>  Z <span class="op">=</span> <span class="va">df_site</span><span class="op">$</span><span class="cn">T</span>, </span>
-<span>  sigma2 <span class="op">=</span> <span class="va">vartau</span>, </span>
-<span>  estimand <span class="op">=</span> <span class="st">"PATE"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Unweighted Unweighted_SE Estimate     SE   RV sigma_tau_bound cor_w</span></span>
-<span><span class="co">#&gt; Z    1107.35        982.65  1356.66 1417.3 0.36          2897.9  0.07</span></span></code></pre></div>
-<p>The <code>summarize_sensitivity</code> function defaults to evaluating the robustness value at <code>q=1</code>, indicating a robustness value, relative to a bias equal to the point estimate. Researchers can specify different values for <code>q</code> in the function. In the generalization setting, researchers can modify the <code>sigma2</code> bound and posit their own values for a plausible bound (given substantive justification). With no specification, <code>sigma2</code> will be automatically calculated to be bound by <code>var(Y(1)) + var(Y(0))</code>.</p>
-<p>Individual components of the sensitivity summaries can be computed as well:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Calculate robustness value:</span></span>
-<span><span class="va">RV</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/robustness_value.html">robustness_value</a></span><span class="op">(</span></span>
-<span>  estimate <span class="op">=</span> <span class="va">ipw</span>, b_star <span class="op">=</span> <span class="fl">0</span>, sigma2 <span class="op">=</span> <span class="va">vartau</span>, weights <span class="op">=</span> <span class="va">weights</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">RV</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.4113622</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="formal-benchmarking">Formal Benchmarking:<a class="anchor" aria-label="anchor" href="#formal-benchmarking"></a>
-</h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Select weighting variables:</span></span>
-<span><span class="va">weighting_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">df_all</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">df_all</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"site"</span>, <span class="st">"S"</span>, <span class="st">"Y"</span>, <span class="st">"T"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Run bechmarking:</span></span>
-<span><span class="va">df_benchmark</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_benchmarking.html">run_benchmarking</a></span><span class="op">(</span></span>
-<span>  <span class="va">weighting_vars</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">df_all</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>  treatment <span class="op">=</span> <span class="st">"T"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, selection <span class="op">=</span> <span class="st">"S"</span>,</span>
-<span>  estimate <span class="op">=</span> <span class="va">ipw</span>,</span>
-<span>  RV <span class="op">=</span> <span class="va">RV</span>, sigma2 <span class="op">=</span> <span class="va">vartau</span>,</span>
-<span>  estimand <span class="op">=</span> <span class="st">"PATE"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">df_benchmark</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   variable R2_benchmark rho_benchmark    bias   MRCS k_sigma_min k_rho_min</span></span>
-<span><span class="co">#&gt; 1 prevearn         0.04          0.59  311.06   4.36        9.99      1.08</span></span>
-<span><span class="co">#&gt; 2      age         0.06          0.75  479.43   2.83        6.91      0.85</span></span>
-<span><span class="co">#&gt; 3  married         0.11          0.19  171.30   7.92        3.82      3.29</span></span>
-<span><span class="co">#&gt; 4   hrwage         0.05         -0.42 -245.12  -5.53        8.32     -1.51</span></span>
-<span><span class="co">#&gt; 5    black         0.20         -0.49 -627.68  -2.16        2.03     -1.30</span></span>
-<span><span class="co">#&gt; 6 hispanic         0.14         -0.10  -96.85 -14.01        3.01     -6.66</span></span>
-<span><span class="co">#&gt; 7  hsorged         0.12          0.08   74.52  18.20        3.51      7.94</span></span>
-<span><span class="co">#&gt; 8 yrs_educ         0.00          0.28   22.79  59.54      408.90      2.26</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="generating-the-bias-contour-plots">Generating the Bias Contour Plots<a class="anchor" aria-label="anchor" href="#generating-the-bias-contour-plots"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/contour_plot.html">contour_plot</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>, <span class="va">vartau</span>, <span class="va">ipw</span>, <span class="va">df_benchmark</span>,</span>
-<span>  benchmark <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  shade_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"prevearn"</span><span class="op">)</span>,</span>
-<span>  label_size <span class="op">=</span> <span class="fl">4</span></span>
-<span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">RV</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">RV</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"text"</span>,</span>
-<span>    x <span class="op">=</span> <span class="va">RV</span> <span class="op">-</span> <span class="fl">0.01</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">RV</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.02</span>,</span>
-<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">RV</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">*</span> <span class="st">"= 0.41"</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="fl">0</span>, vjust <span class="op">=</span> <span class="fl">0</span>, size <span class="op">=</span> <span class="fl">3</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-contour_plot-1.png" width="100%"></p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="shiny-senseweight-app">Shiny senseweight app<a class="anchor" aria-label="anchor" href="#shiny-senseweight-app"></a>
-</h2>
-<p>The <code>senseweight</code> package also includes a Shiny app that allows users to interactively conduct sensitivity analyses. The app is available at <a href="https://tiffanymtang.shinyapps.io/senseweight/" class="external-link uri">https://tiffanymtang.shinyapps.io/senseweight/</a>. The app can also be run locally by running:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">run_app</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><a href="https://tiffanymtang.shinyapps.io/senseweight/" class="external-link"><img src="reference/figures/shinysenseweight.png"></a></p>
+<p>The package implements a series of methods developed in the following papers.</p>
+<p>For the technical introduction of the sensitivity tools:</p>
+<ul>
+<li><a href="https://academic.oup.com/jrsssa/advance-article-abstract/doi/10.1093/jrsssa/qnae012/7626119" class="external-link">Huang, Melody. “Sensitivity Analysis in the Generalization of Experimental Results.” Journal of the Royal Statistical Society Series A: Statistics in Society (2024)</a></li>
+<li><a href="https://www.cambridge.org/core/journals/political-analysis/article/sensitivity-analysis-for-survey-weights/0A13E3843155099F169CF195B8D7604F" class="external-link">Hartman, Erin and Huang, Melody. “Sensitivity Analysis for Survey Weights.” Political Analysis (2024)</a></li>
+</ul>
+<p>For less technical introductions with interesting applications and best practice:</p>
+<ul>
+<li>Huang, Melody and Hartman, Erin. “Assessing Nonignorable Response: Sensitivity Analysis for Survey Weighting, with Applications to Survey Estimates of COVID-19 Vaccination Uptake.” Working paper.</li>
+<li>Bailey, Michael. “Polling at a Crossroads.” (Chapter 7)</li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -239,7 +113,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/melodyyhuang/senseweight/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/melodyyhuang/senseweight/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
