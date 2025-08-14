@@ -152,6 +152,7 @@ run_benchmarking <- function(estimate, RV,
 #' @param pretty If set to \code{TRUE}, will return a Kable table. If set to \code{FALSE}, will return a data.frame.
 #' @param svy_srs Unweighted `svymean` object 
 #' @param svy_wt Weighted `svymean` object
+#' @param sig.fig Significant figures to round the output to (default set to 2)
 #' 
 #' @return Sensitivity summary
 #' @export
@@ -190,7 +191,7 @@ run_benchmarking <- function(estimate, RV,
 summarize_sensitivity <- function(weights = NULL, Y = NULL, Z = NULL, b_star = 0,
                                   estimate = NULL, SE = NULL, unweighted = NULL,
                                   sigma2 = NULL, estimand = "ATT", pretty = FALSE,
-                                  svy_srs = NULL, svy_wt = NULL) {
+                                  svy_srs = NULL, svy_wt = NULL, sig.fig = 2) {
   if (estimand == "Survey") {
     if (!is.null(svy_srs) & !is.null(svy_wt)) {
       return(summarize_sensitivity_survey(svy_srs, svy_wt, weights, stats::var(Y), b_star))
@@ -203,7 +204,7 @@ summarize_sensitivity <- function(weights = NULL, Y = NULL, Z = NULL, b_star = 0
         SE = round(SE, 2),
         RV = round(RV, 2)
       )
-      return(data.frame(df_summary, sigma_Y = sigma2, cor_w = round(stats::cor(weights, Y))))
+      return(data.frame(df_summary, sigma_Y = sigma2, cor_w = stats::cor(weights, Y)))
     }
   }
   if (is.null(unweighted)) {
@@ -236,19 +237,19 @@ summarize_sensitivity <- function(weights = NULL, Y = NULL, Z = NULL, b_star = 0
   # Calculate Robustness Value:
   RV <- robustness_value(estimate, b_star, sigma2, weights[Z == 0])
   df_summary <- data.frame(
-    Unweighted = round(DiM, 2), Unweighted_SE = round(model_DiM$std.error[2], 2),
-    Estimate = round(estimate, 2), SE = round(model_ipw$std.error[2], 2),
-    RV = round(RV, 2)
+    Unweighted = round(DiM, sig.fig), Unweighted_SE = round(model_DiM$std.error[2], sig.fig),
+    Estimate = round(estimate, sig.fig), SE = round(model_ipw$std.error[2], sig.fig),
+    RV = round(RV, sig.fig)
   )
 
   if (estimand == "PATE") {
-    output <- paste("$\\\\widehat \\\\sigma_{\\\\tau, max}=$", round(sqrt(sigma2), 2),
-      "$\\\\widehat{cor}(w, \\\\tau) =$", round(cor_w, 2),
+    output <- paste("$\\\\widehat \\\\sigma_{\\\\tau, max}=$", round(sqrt(sigma2), sig.fig),
+      "$\\\\widehat{cor}(w, \\\\tau) =$", round(cor_w, sig.fig),
       sep = ", "
     )
   } else {
-    output <- paste("$\\\\widehat \\\\sigma_{Y}=$", round(sqrt(sigma2), 2),
-      "$\\\\widehat{cor}(w, Y) =$", round(cor_w, 2),
+    output <- paste("$\\\\widehat \\\\sigma_{Y}=$", round(sqrt(sigma2), sig.fig),
+      "$\\\\widehat{cor}(w, Y) =$", round(cor_w, sig.fig),
       sep = ", "
     )
   }
@@ -260,9 +261,9 @@ summarize_sensitivity <- function(weights = NULL, Y = NULL, Z = NULL, b_star = 0
     )
   } else {
     if (estimand == "PATE") {
-      return(data.frame(df_summary, sigma_tau_bound = round(sqrt(sigma2), 2), cor_w = round(cor_w, 2)))
+      return(data.frame(df_summary, sigma_tau_bound = round(sqrt(sigma2), sig.fig), cor_w = round(cor_w, sig.fig)))
     } else {
-      return(data.frame(df_summary, sigma_Y = round(sqrt(sigma2), 2), cor_w = round(cor_w, 2)))
+      return(data.frame(df_summary, sigma_Y = round(sqrt(sigma2), sig.fig), cor_w = round(cor_w, sig.fig)))
     }
   }
 }

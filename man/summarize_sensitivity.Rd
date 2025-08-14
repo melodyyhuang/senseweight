@@ -16,7 +16,8 @@ summarize_sensitivity(
   estimand = "ATT",
   pretty = FALSE,
   svy_srs = NULL,
-  svy_wt = NULL
+  svy_wt = NULL,
+  sig.fig = 2
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ summarize_sensitivity(
 \item{svy_srs}{Unweighted \code{svymean} object}
 
 \item{svy_wt}{Weighted \code{svymean} object}
+
+\item{sig.fig}{Significant figures to round the output to (default set to 2)}
 }
 \value{
 Sensitivity summary

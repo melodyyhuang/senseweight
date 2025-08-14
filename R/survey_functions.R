@@ -75,7 +75,7 @@ summarize_sensitivity_survey <- function(svy_srs, svy_wt, weights, varY, b_star 
     Unweighted_SE = estimate_srs_se,
     Estimate = estimate_wt,
     SE = estimate_wt_se,
-    RV = round(RV, 2)
+    RV = RV
   )
   return(out)
 }
