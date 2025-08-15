@@ -118,11 +118,6 @@ contour_plot(
   benchmark = TRUE, shade = TRUE,
   shade_var = c("age", "prevearn"),
   label_size = 4
-) +
-  geom_point(aes(x = RV, y = sqrt(RV))) +
-  annotate("text",
-    x = RV - 0.01, y = sqrt(RV) + 0.02,
-    label = expression(RV[1] * "= 0.41"), hjust = 0, vjust = 0, size = 3
-  )
+) 
 ```
 

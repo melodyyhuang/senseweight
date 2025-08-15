@@ -18,7 +18,7 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 In the following vignette, we will walk through how to conduct a sensitivity analysis for survey weights using `senseweight`. 
 
-We will illustrate the analysis using a synthetically generated dataset (available in `data(poll.data)`). The dataset is a synthetic dataset comprising of 1000 individuals, where the outcome variable `Y` indicates whether the individual supports a policy position. When `Y = 1`, this implies that the individual indicated support for a hypothetical candidate or policy position, whereas 0 implies a lack of support. The dataset contains common demographic covariates used in practice (age, education, gender, race, party identification, and an indicator for whether an individual is a born-again Christian).^[The dataset is based upon Wapo/ABC polls used in the 2020 presidential election and is synthetically constructed to preserve the covariance matrix of the original poll. For an analysis using the actual polls, see Hartman and Huang (2024). However, given the re-sampling process, the results will not match the original poll results.]
+We will illustrate the analysis using a synthetically generated dataset (available in `data(poll.data)`). The dataset is a synthetic dataset comprising of 1000 individuals, where the outcome variable `Y` indicates whether the individual supports a policy position. When `Y = 1`, this implies that the individual indicated support, whereas 0 implies a lack of support. The dataset contains common demographic covariates used in practice (age, education, gender, race, party identification, and an indicator for whether an individual is a born-again Christian).^[The dataset is synthetically generated using demographic covariates from a re-sampled  Wapo/ABC poll from 2020. It has been synthetically constructed to preserve the covariance matrix of the original poll. For an analysis using the actual polls, see Hartman and Huang (2024). However, given the re-sampling process, the results will not match the original poll results.]
 
 ```{r setup, message = FALSE, warning=FALSE}
 library(senseweight)
@@ -35,35 +35,23 @@ poll.data |> head()
 # Setting up survey objects 
 The `senseweight` package builds on top of the `survey` package to conduct sensitivity analysis. To start, we will set up different survey objects for our analysis. 
 
-```{r, echo = FALSE}
-pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 
-                0.114, 0.360, 0.528, 0.114, 
-                0.021, 0.034, 0.805, 
-                0.266, 0.075, 0.312, 0.349)
-names(pop_targets) = c("(Intercept)",
-                       "age_buckets36to50",
-                       "age_buckets51to64",
-                       "age_bucketsOver65",
-                       "educHigh School or Less",
-                       "educPost-grad",
-                       "educSome college",
-                       "genderWomen", 
-                       "raceBlack",
-                       "raceHispanic",
-                       "raceOther",
-                       "raceWhite", 
-                       "pidIndependent", "pidOther", 
-                       "pidRepublican", "bornagainYes")
-```
 
 ```{r, warning=FALSE, message=FALSE}
 poll_srs <- svydesign(ids = ~ 1, data = poll.data)
 ```
 
-We have created a vector of population targets using a subset of the 2020 CES. It is in a locally stored vector `pop_targets`:^[To load this in your own R session, you can run `pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 0.114, 0.360, 0.528, 0.114, 0.021, 0.034, 0.805, 0.266, 0.075, 0.312, 0.349)`.] 
+We have created a vector of population targets using a subset of the 2020 CES. It is in a locally stored vector `pop_targets`:
 ```{r}
+pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 
+                0.114, 0.360, 0.528, 0.114, 
+                0.021, 0.034, 0.805, 
+                0.266, 0.075, 0.312, 0.349)
+#Match covariate names in polling data 
+names(pop_targets) = model.matrix(~.-Y, data = poll.data) |> colnames()
 print(pop_targets)
 ```
+
+
 
 We will use raking as our weighting method of choice. 
 ```{r}
@@ -88,12 +76,12 @@ unweighted_estimate = svymean(~ Y, poll_srs, na.rm = TRUE)
 weighted_estimate = svymean(~ Y, model_rake, na.rm = TRUE)
 ```
 
-The unweighted survey estimate is 0.52. 
+The unweighted survey estimate is 0.54. 
 ```{r}
 print(unweighted_estimate)
 ```
 
-In contrast, the weighted survey estimate is 0.49. 
+In contrast, the weighted survey estimate is 0.47. 
 ```{r}
 print(weighted_estimate)
 ```
@@ -103,8 +91,9 @@ print(weighted_estimate)
 With the survey objects, we can now generate our sensitivity summaries. The `senseweight` package provides functions for researchers to generate (1) robustness values; (2) benchmarking results; and (3) bias contour plots. We walk through each of these below.
 
 ## Robustness Value
-The robustness value is a single numeric summary capturing how strong a confounder has to be to change our research conclusion.
-The `summarize_sensitivity` function will produce a table that outputs the unweighted estimate, the weighted estimate, and the robustness value corresponding to a threshold value $b^*$. The threshold value corresponds to an estimate that would result in a change in the substantive takeaway from a result. For example, in our particular setting, we set the threshold value to be $b^* = 0.5$, which would imply that the proportion of individuals who support the policy would change from a minority to a majority. The specification for the threshold value is given by the `b_star` argument in the `summarize_sensitivity` function.
+The robustness value is a single numeric summary capturing how strong a confounder has to be to change our research conclusion. In general, we refer to a confounder that results in enough bias to alter the research conclusion a _killer confounder_. The threshold bias that results in a killer confounder depends on the substantive context. In this example, we are trying to measure support. Thus, if the bias were large enough to move the estimate from 0.47 beyond 0.5, this would imply that the proportion of individuals who support the policy would change from a minority to a majority. 
+
+The `summarize_sensitivity` function will produce a table that outputs the unweighted estimate, the weighted estimate, and the robustness value corresponding to a threshold value $b^*$. The specification for the threshold value is given by the `b_star` argument in the `summarize_sensitivity` function.
 
 ```{r}
 summarize_sensitivity(estimand = 'Survey',
@@ -116,25 +105,15 @@ summarize_sensitivity(estimand = 'Survey',
 
 ```
 
-We obtain a robustness value of 0.02. This implies that if the error from omitting a confounder is able to explain 2% of the variation in the oracle weights and 2% of the variation in the outcome, then this will be sufficient to push the survey estimate above the 50% threshold.
+We obtain a robustness value of 0.05. This implies that if the error from omitting a confounder is able to explain 5% of the variation in the oracle weights and 5% of the variation in the outcome, then this will be sufficient to push the survey estimate above the 50% threshold.
 
 We can also choose to directly estimate the robustness value using the `robustness_value` function: 
 ```{r}
-robustness_value(estimate = 0.49, 
+robustness_value(estimate = as.numeric(weighted_estimate[1]),
                  b_star = 0.5,
                  sigma2 = var(poll.data$Y), 
                  weights = weights)
 ```
-
-Alternatively, researchers may be interested in setting $b^*$ to correspond to an estimate that is 2 standard deviations away from the original estimate. In this case, this would correspond to an estimate of approximately 0.52. 
-```{r}
-robustness_value(estimate = 0.49, 
-                 b_star = 0.52,
-                 sigma2 = var(poll.data$Y), 
-                 weights = weights)
-```
-
-In this case, the the error from omitting a confounder would need to explain 5% of the variation in the oracle weights and 5% of the variation in the outcome to push the survey estimate above the 52% threshold.
 
 ## Benchmarking 
 
@@ -151,13 +130,15 @@ benchmark_survey('educ',
                  Y = poll.data$Y)
 ```
 
+To interpret the benchmarking result above, we see that omitting a confounder with equivalent confounding strength as omitting `education`, controlling for all other covariates, would result in an $R^2$ parameter of 0.32, with a correlation value of 0.06. This results in a bias of 0.03. 
+
 Alternatively, we can choose to benchmark all the covariates by calling `run_benchmarking`. To specify that we are in a survey setting, we set `estimand = "Survey"` in the function:
 ```{r}
 covariates = c("age_buckets", "educ", "gender", "race",
                "educ", "pid", "bornagain")
 
-benchmark_results = run_benchmarking(estimate = 0.49,
-                 RV = 0.02,
+benchmark_results = run_benchmarking(estimate = as.numeric(weighted_estimate[1]),
+                 RV = 0.05,
                  formula = formula_rake,
                  weights = weights,
                  Y = poll.data$Y,
@@ -168,7 +149,7 @@ print(benchmark_results)
 
 ```
 
-The function will automatically return the benchmarking results, as well as a measure called the _minimum relative confounding strength_ (MRCS), which calculates how much stronger (or weaker) an omitted confounder must be, relative to an observed covariate, in order to a be a killer confounder. 
+The function will automatically return the benchmarking results, as well as a measure called the _minimum relative confounding strength_ (MRCS), which calculates how much stronger (or weaker) an omitted confounder must be, relative to an observed covariate, in order to a be a killer confounder. If the MRCS is greater than 1, this implies that an omitted confounder would have to be stronger than observed covariate to result in a killer confounder. In contrast, for an MRCS less than 1, this implies that an omitted confounder can be weaker than an observed covariate to result in a killer confounder.  
 
 ## Bias contour plot
 
@@ -182,3 +163,5 @@ contour_plot(varW = var(weights),
              shade = TRUE, 
              label_size = 4)
 ```
+
+The $y$-axis varies the degree to which the omitted confounder is imbalanced, while the $x$-axis varies the degree to which the imbalance in the omitted confounder is related to the outcome. The resulting contours represent the bias that occurs for that specified $\{\rho, R^2\}$ value. The shaded region denotes the killer confounder region. This can be specified using the `killer_confounder` flag, and should map to the chosen threshold value $b^*$. 
