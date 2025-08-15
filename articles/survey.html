@@ -81,16 +81,15 @@ dataset (available in <code>data(poll.data)</code>). The dataset is a
 synthetic dataset comprising of 1000 individuals, where the outcome
 variable <code>Y</code> indicates whether the individual supports a
 policy position. When <code>Y = 1</code>, this implies that the
-individual indicated support for a hypothetical candidate or policy
-position, whereas 0 implies a lack of support. The dataset contains
-common demographic covariates used in practice (age, education, gender,
-race, party identification, and an indicator for whether an individual
-is a born-again Christian).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The dataset is based upon Wapo/ABC polls used in the
-2020 presidential election and is synthetically constructed to preserve
-the covariance matrix of the original poll. For an analysis using the
-actual polls, see Hartman and Huang (2024). However, given the
-re-sampling process, the results will not match the original poll
-results.&lt;/p&gt;"><sup>1</sup></a></p>
+individual indicated support, whereas 0 implies a lack of support. The
+dataset contains common demographic covariates used in practice (age,
+education, gender, race, party identification, and an indicator for
+whether an individual is a born-again Christian).<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The dataset is synthetically generated using demographic
+covariates from a re-sampled Wapo/ABC poll from 2020. It has been
+synthetically constructed to preserve the covariance matrix of the
+original poll. For an analysis using the actual polls, see Hartman and
+Huang (2024). However, given the re-sampling process, the results will
+not match the original poll results.&lt;/p&gt;"><sup>1</sup></a></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://melodyyhuang.github.io/senseweight/">senseweight</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://r-survey.r-forge.r-project.org/survey/" class="external-link">survey</a></span><span class="op">)</span></span></code></pre></div>
@@ -98,13 +97,13 @@ results.&lt;/p&gt;"><sup>1</sup></a></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">poll.data</span><span class="op">)</span></span>
 <span><span class="va">poll.data</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Y age_buckets                educ gender  race         pid bornagain</span></span>
-<span><span class="co">#&gt; 1 0      51to64             College    Men White Independent       Yes</span></span>
-<span><span class="co">#&gt; 2 1      Over65           Post-grad  Women White    Democrat       Yes</span></span>
-<span><span class="co">#&gt; 3 0      51to64 High School or Less    Men White Independent        No</span></span>
-<span><span class="co">#&gt; 4 0      36to50 High School or Less    Men White  Republican        No</span></span>
-<span><span class="co">#&gt; 5 1      51to64             College  Women White Independent       Yes</span></span>
-<span><span class="co">#&gt; 6 0      Over65             College    Men White Independent        No</span></span></code></pre></div>
+<span><span class="co">#&gt;   Y age_buckets         educ gender  race         pid bornagain</span></span>
+<span><span class="co">#&gt; 1 0      36to50      College    Men White Independent        No</span></span>
+<span><span class="co">#&gt; 2 0      Over65 Some college  Women White Independent       Yes</span></span>
+<span><span class="co">#&gt; 3 1      36to50      College  Women White    Democrat        No</span></span>
+<span><span class="co">#&gt; 4 1      51to64    Post-grad  Women White    Democrat        No</span></span>
+<span><span class="co">#&gt; 5 0      Over65 Some college    Men White Independent       Yes</span></span>
+<span><span class="co">#&gt; 6 1      36to50    Post-grad    Men Other       Other        No</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="setting-up-survey-objects">Setting up survey objects<a class="anchor" aria-label="anchor" href="#setting-up-survey-objects"></a>
 </h2>
@@ -114,10 +113,15 @@ we will set up different survey objects for our analysis.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">poll_srs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/svydesign.html" class="external-link">svydesign</a></span><span class="op">(</span>ids <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>, data <span class="op">=</span> <span class="va">poll.data</span><span class="op">)</span></span></code></pre></div>
 <p>We have created a vector of population targets using a subset of the
-2020 CES. It is in a locally stored vector <code>pop_targets</code>:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;To load this in your own R session, you can run
-&lt;code&gt;pop_targets = c(1, 0.212, 0.264, 0.236, 0.310, 0.114, 0.360, 0.528, 0.114, 0.021, 0.034, 0.805, 0.266, 0.075, 0.312, 0.349)&lt;/code&gt;.&lt;/p&gt;"><sup>2</sup></a></p>
+2020 CES. It is in a locally stored vector <code>pop_targets</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pop_targets</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pop_targets</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.212</span>, <span class="fl">0.264</span>, <span class="fl">0.236</span>, <span class="fl">0.310</span>, </span>
+<span>                <span class="fl">0.114</span>, <span class="fl">0.360</span>, <span class="fl">0.528</span>, <span class="fl">0.114</span>, </span>
+<span>                <span class="fl">0.021</span>, <span class="fl">0.034</span>, <span class="fl">0.805</span>, </span>
+<span>                <span class="fl">0.266</span>, <span class="fl">0.075</span>, <span class="fl">0.312</span>, <span class="fl">0.349</span><span class="op">)</span></span>
+<span><span class="co">#Match covariate names in polling data </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pop_targets</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="va">Y</span>, data <span class="op">=</span> <span class="va">poll.data</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pop_targets</span><span class="op">)</span></span>
 <span><span class="co">#&gt;             (Intercept)       age_buckets36to50       age_buckets51to64 </span></span>
 <span><span class="co">#&gt;                   1.000                   0.212                   0.264 </span></span>
 <span><span class="co">#&gt;       age_bucketsOver65 educHigh School or Less           educPost-grad </span></span>
@@ -151,16 +155,16 @@ we will set up different survey objects for our analysis.</p>
 <span></span>
 <span><span class="va">unweighted_estimate</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Y</span>, <span class="va">poll_srs</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">weighted_estimate</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svymean</a></span><span class="op">(</span><span class="op">~</span> <span class="va">Y</span>, <span class="va">model_rake</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>The unweighted survey estimate is 0.52.</p>
+<p>The unweighted survey estimate is 0.54.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unweighted_estimate</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   mean     SE</span></span>
-<span><span class="co">#&gt; Y 0.52 0.0158</span></span></code></pre></div>
-<p>In contrast, the weighted survey estimate is 0.49.</p>
+<span><span class="co">#&gt; Y 0.54 0.0158</span></span></code></pre></div>
+<p>In contrast, the weighted survey estimate is 0.47.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">weighted_estimate</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      mean     SE</span></span>
-<span><span class="co">#&gt; Y 0.48981 0.0158</span></span></code></pre></div>
+<span><span class="co">#&gt; Y 0.46843 0.0168</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="summarizing-sensitivity">Summarizing sensitivity<a class="anchor" aria-label="anchor" href="#summarizing-sensitivity"></a>
@@ -173,19 +177,21 @@ and (3) bias contour plots. We walk through each of these below.</p>
 <h3 id="robustness-value">Robustness Value<a class="anchor" aria-label="anchor" href="#robustness-value"></a>
 </h3>
 <p>The robustness value is a single numeric summary capturing how strong
-a confounder has to be to change our research conclusion. The
-<code>summarize_sensitivity</code> function will produce a table that
-outputs the unweighted estimate, the weighted estimate, and the
+a confounder has to be to change our research conclusion. In general, we
+refer to a confounder that results in enough bias to alter the research
+conclusion a <em>killer confounder</em>. The threshold bias that results
+in a killer confounder depends on the substantive context. In this
+example, we are trying to measure support. Thus, if the bias were large
+enough to move the estimate from 0.47 beyond 0.5, this would imply that
+the proportion of individuals who support the policy would change from a
+minority to a majority.</p>
+<p>The <code>summarize_sensitivity</code> function will produce a table
+that outputs the unweighted estimate, the weighted estimate, and the
 robustness value corresponding to a threshold value
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>b</mi><mo>*</mo></msup><annotation encoding="application/x-tex">b^*</annotation></semantics></math>.
-The threshold value corresponds to an estimate that would result in a
-change in the substantive takeaway from a result. For example, in our
-particular setting, we set the threshold value to be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>b</mi><mo>*</mo></msup><mo>=</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">b^* = 0.5</annotation></semantics></math>,
-which would imply that the proportion of individuals who support the
-policy would change from a minority to a majority. The specification for
-the threshold value is given by the <code>b_star</code> argument in the
-<code>summarize_sensitivity</code> function.</p>
+The specification for the threshold value is given by the
+<code>b_star</code> argument in the <code>summarize_sensitivity</code>
+function.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarize_sensitivity.html">summarize_sensitivity</a></span><span class="op">(</span>estimand <span class="op">=</span> <span class="st">'Survey'</span>,</span>
 <span>                      Y <span class="op">=</span> <span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span>,</span>
@@ -193,35 +199,20 @@ the threshold value is given by the <code>b_star</code> argument in the
 <span>                      svy_srs <span class="op">=</span> <span class="va">unweighted_estimate</span>, </span>
 <span>                      svy_wt <span class="op">=</span> <span class="va">weighted_estimate</span>,</span>
 <span>                      b_star <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Unweighted Unweighted_SE Estimate         SE         RV</span></span>
-<span><span class="co">#&gt; 1       0.52    0.01580664 0.489811 0.01578579 0.01843654</span></span></code></pre></div>
-<p>We obtain a robustness value of 0.02. This implies that if the error
-from omitting a confounder is able to explain 2% of the variation in the
-oracle weights and 2% of the variation in the outcome, then this will be
+<span><span class="co">#&gt;   Unweighted Unweighted_SE  Estimate        SE         RV</span></span>
+<span><span class="co">#&gt; 1       0.54     0.0157686 0.4684269 0.0167966 0.04977723</span></span></code></pre></div>
+<p>We obtain a robustness value of 0.05. This implies that if the error
+from omitting a confounder is able to explain 5% of the variation in the
+oracle weights and 5% of the variation in the outcome, then this will be
 sufficient to push the survey estimate above the 50% threshold.</p>
 <p>We can also choose to directly estimate the robustness value using
 the <code>robustness_value</code> function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/robustness_value.html">robustness_value</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fl">0.49</span>, </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/robustness_value.html">robustness_value</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">weighted_estimate</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>                 b_star <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>                 sigma2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>, </span>
 <span>                 weights <span class="op">=</span> <span class="va">weights</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.0180977</span></span></code></pre></div>
-<p>Alternatively, researchers may be interested in setting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>b</mi><mo>*</mo></msup><annotation encoding="application/x-tex">b^*</annotation></semantics></math>
-to correspond to an estimate that is 2 standard deviations away from the
-original estimate. In this case, this would correspond to an estimate of
-approximately 0.52.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/robustness_value.html">robustness_value</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fl">0.49</span>, </span>
-<span>                 b_star <span class="op">=</span> <span class="fl">0.52</span>,</span>
-<span>                 sigma2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>, </span>
-<span>                 weights <span class="op">=</span> <span class="va">weights</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.05331068</span></span></code></pre></div>
-<p>In this case, the the error from omitting a confounder would need to
-explain 5% of the variation in the oracle weights and 5% of the
-variation in the outcome to push the survey estimate above the 52%
-threshold.</p>
+<span><span class="co">#&gt; [1] 0.04977723</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="benchmarking">Benchmarking<a class="anchor" aria-label="anchor" href="#benchmarking"></a>
@@ -233,25 +224,32 @@ omitted confounder that has equivalent confounding strength to an
 observed covariate.</p>
 <p>To benchmark a single covariate, we can use the
 <code>benchmark_survey</code> function:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/benchmark_survey.html">benchmark_survey</a></span><span class="op">(</span><span class="st">'educ'</span>, </span>
 <span>                 formula <span class="op">=</span> <span class="va">formula_rake</span>,</span>
 <span>                 weights <span class="op">=</span> <span class="va">weights</span>,</span>
 <span>                 population_targets <span class="op">=</span> <span class="va">pop_targets</span>,</span>
 <span>                 sample_svy <span class="op">=</span> <span class="va">poll_srs</span>,</span>
 <span>                 Y <span class="op">=</span> <span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   variable R2_benchmark rho_benchmark        bias</span></span>
-<span><span class="co">#&gt; 1     educ    0.2237989    0.02030063 0.005968458</span></span></code></pre></div>
+<span><span class="co">#&gt;   variable R2_benchmark rho_benchmark       bias</span></span>
+<span><span class="co">#&gt; 1     educ    0.3193473    0.06009261 0.02545009</span></span></code></pre></div>
+<p>To interpret the benchmarking result above, we see that omitting a
+confounder with equivalent confounding strength as omitting
+<code>education</code>, controlling for all other covariates, would
+result in an
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
+parameter of 0.32, with a correlation value of 0.06. This results in a
+bias of 0.03.</p>
 <p>Alternatively, we can choose to benchmark all the covariates by
 calling <code>run_benchmarking</code>. To specify that we are in a
 survey setting, we set <code>estimand = "Survey"</code> in the
 function:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covariates</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_buckets"</span>, <span class="st">"educ"</span>, <span class="st">"gender"</span>, <span class="st">"race"</span>,</span>
 <span>               <span class="st">"educ"</span>, <span class="st">"pid"</span>, <span class="st">"bornagain"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">benchmark_results</span> <span class="op">=</span> <span class="fu"><a href="../reference/run_benchmarking.html">run_benchmarking</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fl">0.49</span>,</span>
-<span>                 RV <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span><span class="va">benchmark_results</span> <span class="op">=</span> <span class="fu"><a href="../reference/run_benchmarking.html">run_benchmarking</a></span><span class="op">(</span>estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">weighted_estimate</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                 RV <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>                 formula <span class="op">=</span> <span class="va">formula_rake</span>,</span>
 <span>                 weights <span class="op">=</span> <span class="va">weights</span>,</span>
 <span>                 Y <span class="op">=</span> <span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span>,</span>
@@ -259,18 +257,22 @@ function:</p>
 <span>                 population_targets <span class="op">=</span> <span class="va">pop_targets</span>,</span>
 <span>                 estimand<span class="op">=</span> <span class="st">"Survey"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">benchmark_results</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      variable R2_benchmark rho_benchmark  bias     MRCS k_sigma_min k_rho_min</span></span>
-<span><span class="co">#&gt; 1 age_buckets         0.39          0.04  0.02    31.46        0.05      3.93</span></span>
-<span><span class="co">#&gt; 2        educ         0.22          0.02  0.01    82.10        0.09      6.97</span></span>
-<span><span class="co">#&gt; 3      gender         0.07         -0.08 -0.01   -42.33        0.27     -1.88</span></span>
-<span><span class="co">#&gt; 4        race         0.15          0.01  0.00   334.23        0.14     21.76</span></span>
-<span><span class="co">#&gt; 5         pid         0.04          0.00  0.00 -1460.14        0.50    -46.86</span></span>
-<span><span class="co">#&gt; 6   bornagain         0.04          0.05  0.01    93.05        0.47      3.09</span></span></code></pre></div>
+<span><span class="co">#&gt;      variable R2_benchmark rho_benchmark  bias   MRCS k_sigma_min k_rho_min</span></span>
+<span><span class="co">#&gt; 1 age_buckets         0.39          0.05  0.02  20.19        0.13      4.79</span></span>
+<span><span class="co">#&gt; 2        educ         0.32          0.06  0.03  18.41        0.16      3.72</span></span>
+<span><span class="co">#&gt; 3      gender         0.07         -0.05 -0.01 -57.15        0.74     -4.54</span></span>
+<span><span class="co">#&gt; 4        race         0.06          0.03  0.01  86.03        0.79      6.58</span></span>
+<span><span class="co">#&gt; 5         pid         0.04          0.04  0.01  79.50        1.16      4.98</span></span>
+<span><span class="co">#&gt; 6   bornagain         0.07          0.07  0.01  39.04        0.75      3.09</span></span></code></pre></div>
 <p>The function will automatically return the benchmarking results, as
 well as a measure called the <em>minimum relative confounding
 strength</em> (MRCS), which calculates how much stronger (or weaker) an
 omitted confounder must be, relative to an observed covariate, in order
-to a be a killer confounder.</p>
+to a be a killer confounder. If the MRCS is greater than 1, this implies
+that an omitted confounder would have to be stronger than observed
+covariate to result in a killer confounder. In contrast, for an MRCS
+less than 1, this implies that an omitted confounder can be weaker than
+an observed covariate to result in a killer confounder.</p>
 </div>
 <div class="section level3">
 <h3 id="bias-contour-plot">Bias contour plot<a class="anchor" aria-label="anchor" href="#bias-contour-plot"></a>
@@ -278,14 +280,27 @@ to a be a killer confounder.</p>
 <p>To visualize the sensitivity of our underlying estimates, we can
 generate a bias contour plot using the following
 <code>contour_plot</code> function:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/contour_plot.html">contour_plot</a></span><span class="op">(</span>varW <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>, </span>
 <span>             sigma2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">poll.data</span><span class="op">$</span><span class="va">Y</span><span class="op">)</span>,</span>
 <span>             killer_confounder <span class="op">=</span> <span class="fl">0.5</span>, </span>
 <span>             df_benchmark <span class="op">=</span> <span class="va">benchmark_results</span>,</span>
 <span>             shade <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>             label_size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="survey_files/figure-html/unnamed-chunk-14-1.png" width="624"></p>
+<p><img src="survey_files/figure-html/unnamed-chunk-12-1.png" width="624"></p>
+<p>The
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>-axis
+varies the degree to which the omitted confounder is imbalanced, while
+the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>-axis
+varies the degree to which the imbalance in the omitted confounder is
+related to the outcome. The resulting contours represent the bias that
+occurs for that specified
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>ρ</mi><mo>,</mo><msup><mi>R</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\rho, R^2\}</annotation></semantics></math>
+value. The shaded region denotes the killer confounder region. This can
+be specified using the <code>killer_confounder</code> flag, and should
+map to the chosen threshold value
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>b</mi><mo>*</mo></msup><annotation encoding="application/x-tex">b^*</annotation></semantics></math>.</p>
 </div>
 </div>
 
